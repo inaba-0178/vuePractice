@@ -1,0 +1,132 @@
+.scrollBox {
+    list-style: none;
+    position: relative;
+   /* width: 705px; */
+    border-top: 3px solid #d6d4d0;
+    border-radius: 2px;
+    background-color: #f5f4f0;
+    font-size: 13px
+}
+
+.scrollBox.is-fixed {
+    position: fixed;
+    top: 0
+}
+
+.scrollBox__barTab {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    padding: 0 13px 0 13px;
+    list-style: none;
+}
+
+.shashuList__categoryTitle {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: baseline;
+    -webkit-align-items: baseline;
+    align-items: baseline;
+    margin-bottom: 17px
+}
+
+.scrollBox__barTab__list>a {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px 10px 6px
+}
+
+.scrollBox__barTab__list>a.is-on,.scrollBox__barTab__list>a:hover {
+    color: #ff6010
+}
+
+.scrollBox__barTab__list>a::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-block;
+    margin-top: -6px;
+    margin-right: 4px;
+    border-top: 10px solid #ff6010;
+    border-right: 4px solid rgba(0,0,0,0);
+    border-left: 4px solid rgba(0,0,0,0)
+}
+
+.scrollBox__barTab__list>span {
+    position: relative;
+    display: inline-block;
+    padding: 10px 22px 10px 6px;
+    color: #ccc
+}
+
+.scrollBox__barTab__list>span::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-block;
+    margin-top: -6px;
+    margin-right: 4px;
+    border-top: 10px solid #ccc;
+    border-right: 4px solid rgba(0,0,0,0);
+    border-left: 4px solid rgba(0,0,0,0)
+}
+
+
+
+.shashuList__categoryTitle span {
+    padding-left: 23px
+}
+
+.shashuList__category {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-bottom: 25px
+}
+
+.shashuList__category__item {
+    width: 225px;
+    margin-bottom: 15px;
+    padding: 18px 23px 5px
+}
+
+.shashuList__category__item.is-checked {
+    background-color: #fff2e6
+}
+
+.shashuList__category__item>a {
+    display: block;
+    width: 185px;
+    height: 135px;
+    margin-bottom: 5px;
+    background-color: #fff
+}
+
+.shashuList__category__item img:hover {
+    opacity: .5
+}
+
+.shashuList__category__item label {
+    font-size: 14px;
+    font-weight: bold
+}
+
+.shashuList__category__item label span {
+    font-size: 10px
+}
+
+.shashuList__category__item input[type=checkbox]+.label--checkbox {
+    height: inherit
+}
+
+.shashuList__category__item p {
+    padding-left: 27px
+}

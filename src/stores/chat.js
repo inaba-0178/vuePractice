@@ -1,0 +1,120 @@
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import axios from 'axios'
+
+export const useChatStore = defineStore('chat', () => {
+    const rooms = ref([])
+    const currentRoom = ref(null)
+    const messages = ref([])
+    const typingUsers = ref([])
+
+    // ルーム一覧取得
+    async function fetchRooms() {
+        const { data } = await axios.get('/api/rooms')
+        rooms.value = data
+    }
+
+    // ルーム選択
+    async function selectRoom(roomId) {
+        if (currentRoom.value) {
+            window.Echo.leave(`room.${currentRoom.value.id}`)
+        }
+
+        const { data } = await axios.get(`/api/rooms/${roomId}`)
+        currentRoom.value = data
+        await fetchMessages(roomId)
+        subscribeToRoom(roomId)
+
+        // ルーム入室時に未読メッセージを既読にする
+        const unreadIds = messages.value
+            .filter(m => m.message_reads?.length === 0)
+            .map(m => m.id)
+
+        if (unreadIds.length > 0) {
+            await markAsRead(roomId, unreadIds)
+        }
+    }
+
+    // メッセージ取得
+    async function fetchMessages(roomId) {
+        const { data } = await axios.get(`/api/rooms/${roomId}/messages`)
+        console.log('メッセージデータ:', JSON.stringify(data[0]))
+        messages.value = data
+    }
+
+    // メッセージ送信
+    async function sendMessage(roomId, message) {
+        const { data } = await axios.post(`/api/rooms/${roomId}/messages`, { message })
+        //messages.value.push(data)
+    }
+
+    // 既読送信
+    async function markAsRead(roomId, messageIds) {
+        await axios.post(`/api/rooms/${roomId}/messages/read`, { message_ids: messageIds })
+    }
+
+    // タイピング通知
+    async function sendTyping(roomId, isTyping) {
+        await axios.post(`/api/rooms/${roomId}/typing`, { is_typing: isTyping })
+    }
+
+    // WebSocket購読
+    function subscribeToRoom(roomId) {
+        window.Echo.channel(`room.${roomId}`)
+            .listen('.message.sent', (e) => {
+                messages.value.push({
+                    id:            e.id,
+                    room_id:       e.roomId,
+                    user_id:       e.userId,
+                    message:       e.message,
+                    created_at:    e.createdAt,
+                    user:          e.user,
+                    message_reads: [],
+                })
+                markAsRead(roomId, [e.id])
+            })
+            .listen('.message.read', (e) => {
+                // 既読されたメッセージのmessage_readsを更新
+                e.messageIds.forEach(messageId => {
+                    const message = messages.value.find(m => m.id === messageId)
+                    if (message) {
+                        if (!message.message_reads) {
+                            message.message_reads = []
+                        }
+                        // 同じユーザーの既読が重複しないように
+                        const alreadyRead = message.message_reads.some(r => r.user_id === e.userId)
+                        if (!alreadyRead) {
+                            message.message_reads.push({ user_id: e.userId })
+                        }
+                    }
+                })
+            })
+            .listenForWhisper('typing', (e) => {
+                if (e.isTyping) {
+                    typingUsers.value.push(e.userName)
+                } else {
+                    typingUsers.value = typingUsers.value.filter(u => u !== e.userName)
+                }
+            })
+    }
+
+    // WebSocket切断
+    function leaveRoom(roomId) {
+        window.Echo.leave(`room.${roomId}`)
+        typingUsers.value = []
+    }
+
+    return {
+        rooms,
+        currentRoom,
+        messages,
+        typingUsers,
+        fetchRooms,
+        selectRoom,
+        fetchMessages,
+        sendMessage,
+        markAsRead,
+        sendTyping,
+        leaveRoom,
+    }
+})
