@@ -9,6 +9,10 @@ import ForgotPassword from '@/views/ForgotPassword.vue'
 import ResetPassword  from '@/views/ResetPassword.vue'
 import Register     from '@/views/Register.vue'
 import RegisterForm from '@/views/RegisterForm.vue'
+import MemberLogin from '@/views/MemberLogin.vue'
+import MypageLayout  from '@/views/Mypage/MypageLayout.vue'
+import MypageProfile from '@/views/Mypage/MypageProfile.vue'
+import MypageEdit    from '@/views/Mypage/MypageEdit.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -59,7 +63,16 @@ const routes = [
     name: 'register-form',
     component: RegisterForm
   },
-  { path: '/modal-test', name: 'modal-test', component: () => import('@/views/ModalTest.vue') }
+  { path: '/modal-test', name: 'modal-test', component: () => import('@/views/ModalTest.vue') },
+  {
+    path: '/member-login',
+    name: 'member-login',
+    component: MemberLogin
+  },
+  { path: '/mypage', component: MypageLayout, children: [
+    { path: '',     name: 'mypage',       component: MypageProfile },
+    { path: 'edit', name: 'mypage-edit',  component: MypageEdit },
+  ]},
 ]
 
 const router = createRouter({
