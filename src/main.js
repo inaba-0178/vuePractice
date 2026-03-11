@@ -15,4 +15,9 @@ app.use(router)
 const auth = useAuthStore()
 auth.restore()
 
+const memberToken = localStorage.getItem('member_token')
+if (memberToken) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${memberToken}`
+}
+
 app.mount('#app')
