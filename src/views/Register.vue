@@ -1,60 +1,56 @@
 <template>
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-card__inner">
-                <h1 class="login-title">LOGIN</h1>
-                <p class="login-subtitle">UserID、Passwordをご入力の上、「LOGIN」ボタンをクリックしてください。</p>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-card__inner">
+        <h1 class="login-title">REGISTER</h1>
+        <p class="login-subtitle">ご登録のメールアドレスを入力してください。<br>確認メールをお送りします。</p>
 
-                <div class="login-form">
-                    <div class="input-wrapper">
-                        <input
-                            v-model="email"
-                            type="email"
-                            placeholder="UserID"
-                            class="login-input"
-                            :class="{ 'login-input--error': error }"
-                        />
-                    </div>
+        <div class="login-form">
+          <div class="input-wrapper">
+            <input
+              v-model="email"
+              type="email"
+              placeholder="メールアドレス"
+              class="login-input"
+              :class="{ 'login-input--error': error }"
+            />
+          </div>
 
-                    <div class="input-wrapper">
-                        <input
-                            v-model="password"
-                            type="password"
-                            placeholder="Password"
-                            class="login-input"
-                            :class="{ 'login-input--error': error }"
-                        />
-                    </div>
+          <p v-if="error" class="login-error">{{ error }}</p>
+          <p v-if="success" class="login-success">{{ success }}</p>
 
-                    <p v-if="error" class="login-error">{{ error }}</p>
-
-                    <button @click="handleLogin" class="login-button">LOGIN</button>
-                    <router-link to="/forgot-password" class="back-link">パスワードをお忘れの方</router-link>
-                    <router-link to="/register" class="back-link">会員登録はこちら</router-link>
-                    <router-link to="/" class="back-link">トップページに戻る</router-link>
-                </div>
-            </div>
+          <button @click="handleSubmit" class="login-button" :disabled="loading">
+            {{ loading ? '送信中...' : '確認メールを送信する' }}
+          </button>
+          <router-link to="/login" class="back-link">ログインページに戻る</router-link>
         </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import axios from 'axios'
 
-const auth     = useAuthStore()
-const router   = useRouter()
-const email    = ref('')
-const password = ref('')
-const error    = ref('')
+const email   = ref('')
+const error   = ref('')
+const success = ref('')
+const loading = ref(false)
 
-async function handleLogin() {
+async function handleSubmit() {
+  error.value   = ''
+  success.value = ''
+  loading.value = true
+
   try {
-    await auth.login(email.value, password.value)
-    router.push('/')
+    await axios.post('/api/Members/provisional', { email: email.value })
+    success.value = '確認メールを送信しました。メールをご確認ください。'
+    email.value   = ''
   } catch (e) {
-    error.value = 'メールアドレスまたはパスワードが違います'
+    error.value = e.response?.data?.message ?? 'エラーが発生しました'
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -164,6 +160,16 @@ async function handleLogin() {
   animation: fadeIn 0.3s ease;
 }
 
+.login-success {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  color: #6bffb8;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.03em;
+  animation: fadeIn 0.3s ease;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -191,12 +197,25 @@ async function handleLogin() {
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
 }
 
+.login-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .login-button:active {
   transform: scale(0.98);
 }
 
 .back-link {
+  display: block;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
   color: #888;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease;
 }
 
 .back-link:hover {
