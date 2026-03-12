@@ -13,6 +13,7 @@ import MemberLogin from '@/views/MemberLogin.vue'
 import MypageLayout  from '@/views/Mypage/MypageLayout.vue'
 import MypageProfile from '@/views/Mypage/MypageProfile.vue'
 import MypageEdit    from '@/views/Mypage/MypageEdit.vue'
+import MypageEmailChange from '@/views/Mypage/MypageEmailChange.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -72,7 +73,9 @@ const routes = [
   { path: '/mypage', component: MypageLayout, children: [
     { path: '',     name: 'mypage',       component: MypageProfile },
     { path: 'edit', name: 'mypage-edit',  component: MypageEdit },
+    { path: 'email',  name: 'mypage-email', component: MypageEmailChange },
   ]},
+
 ]
 
 const router = createRouter({

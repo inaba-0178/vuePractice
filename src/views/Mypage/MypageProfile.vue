@@ -101,7 +101,7 @@ const genderLabel = computed(() => {
 onMounted(async () => {
   try {
     const res = await axios.get('/api/EditMembers/Profile')
-    member.value = res.data
+    member.value = res.data.data
   } catch (e) {
     if (e.response?.status === 401) {
       router.push('/member-login')
