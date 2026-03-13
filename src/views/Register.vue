@@ -22,7 +22,7 @@
           <button @click="handleSubmit" class="login-button" :disabled="loading">
             {{ loading ? '送信中...' : '確認メールを送信する' }}
           </button>
-          <router-link to="/login" class="back-link">ログインページに戻る</router-link>
+          <router-link to="/member-login" class="back-link">ログインページに戻る</router-link>
         </div>
       </div>
     </div>
