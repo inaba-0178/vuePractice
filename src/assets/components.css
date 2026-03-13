@@ -1,0 +1,375 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap');
+
+/* ===========================
+   リセット・ベース
+=========================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #0a0a0a;
+    color: #ccc;
+    min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.maker-wrapper {
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: #ccc;
+}
+.bodytype-wrapper {
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: #ccc;
+}
+/* ===========================
+   ヘッダー
+=========================== */
+.header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    background: #111;
+    border-bottom: 1px solid #222;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-nav__logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: 0.2em;
+}
+
+.header-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-link {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #ccc !important;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #fff;
+}
+
+.nav-link--cta {
+    border: 1px solid #dc5078;
+    border-radius: 50px;
+    padding: 8px 24px;
+    color: #dc5078;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.nav-link--cta:hover {
+    background: #dc5078;
+    color: #fff;
+}
+
+/* ===========================
+   ローディング
+=========================== */
+.loading-overlay {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    gap: 20px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #222;
+    border-top: 2px solid #dc5078;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: #666;
+    letter-spacing: 0.1em;
+}
+
+/* ===========================
+   ヒーロー
+=========================== */
+.hero {
+    position: relative;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hero--tall {
+    height: 480px;
+}
+
+.hero__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.3);
+}
+
+.hero__inner {
+    position: relative;
+    z-index: 1;
+    padding: 0 80px;
+}
+
+.hero__label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #dc5078;
+    letter-spacing: 0.2em;
+    margin: 0 0 16px;
+}
+
+.hero__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px;
+    line-height: 1.2;
+}
+
+.hero__title--large {
+    font-size: 56px;
+}
+
+.hero__sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: #aaa;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+/* ===========================
+   セクション共通
+=========================== */
+.search-section {
+    padding: 64px 80px;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.section-header {
+    margin-bottom: 40px;
+}
+
+.section-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #dc5078;
+    letter-spacing: 0.2em;
+    margin: 0 0 8px;
+}
+
+.section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: 0.1em;
+    margin: 0;
+}
+
+.section-count {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #666;
+    margin-left: 8px;
+}
+
+/* ===========================
+   タブ
+=========================== */
+.tab-scroll {
+    overflow-x: auto;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #222;
+}
+
+.tab-list {
+    display: flex;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tab-list__item {
+    flex-shrink: 0;
+}
+
+.tab-list__link {
+    display: block;
+    padding: 12px 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #ccc;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-list__link:hover {
+    color: #dc5078;
+    border-bottom-color: #dc5078;
+}
+
+.tab-list__link--disabled {
+    color: #333;
+    cursor: default;
+    pointer-events: none;
+}
+
+.tab-list__count {
+    color: #666;
+    margin-left: 4px;
+}
+
+/* ===========================
+   車種カード
+=========================== */
+.car-list {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.car-group__header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #222;
+}
+
+.car-group__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: #dc5078;
+    letter-spacing: 0.15em;
+    margin: 0;
+}
+
+.car-item {
+    border: 1px solid #222;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.car-item:hover {
+    border-color: #444;
+}
+
+.car-item__image-link {
+    display: block;
+}
+
+.car-item__image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+    background: #1a1a1a;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+.car-item__body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.car-item__checkbox {
+    display: none;
+}
+
+.car-item__label {
+    display: block;
+    cursor: pointer;
+}
+
+.car-item__name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #ccc;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+}
+
+.car-item__name:hover {
+    color: #dc5078;
+}
+
+.car-item__count {
+    font-size: 11px;
+    font-weight: 300;
+    color: #666;
+    margin-left: 4px;
+}
+
+.car-item__catalog {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    color: #dc5078;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: opacity 0.2s ease;
+}
+
+.car-item__catalog:hover {
+    opacity: 0.7;
+}
