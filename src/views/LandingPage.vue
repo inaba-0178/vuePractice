@@ -9,7 +9,7 @@
                 <a href="#" @click.prevent="handleLogout">ログアウト</a>
             </template>
             <template v-else>
-                <router-link :to="{ name: 'login' }">ログイン</router-link>
+                <router-link :to="{ name: 'member-login' }">ログイン</router-link>
             </template>
         </header>
 

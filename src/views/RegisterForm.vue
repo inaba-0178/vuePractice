@@ -161,7 +161,7 @@
         <button @click="handleSubmit" class="register-button" :disabled="loading">
           {{ loading ? '登録中...' : '登録する' }}
         </button>
-        <router-link to="/login" class="back-link">ログインページに戻る</router-link>
+        <router-link to="/member-login" class="back-link">ログインページに戻る</router-link>
       </div>
 
     </div>
@@ -289,7 +289,7 @@ function validate() {
 const showModal = ref(false)
 
 function goToLogin() {
-  router.push('/login')
+  router.push('/member-login')
 }
 
 async function handleSubmit() {

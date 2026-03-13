@@ -54,7 +54,7 @@
           <button @click="handleSubmit" class="login-button" :disabled="loading">
             {{ loading ? '変更中...' : 'パスワードを変更する' }}
           </button>
-          <router-link to="/login" class="back-link">ログインページに戻る</router-link>
+          <router-link to="/member-login" class="back-link">ログインページに戻る</router-link>
         </div>
       </div>
     </div>
@@ -111,7 +111,7 @@ async function handleSubmit() {
       password_confirmation: passwordConfirmation.value,
     })
     success.value = 'パスワードを変更しました'
-    setTimeout(() => router.push('/login'), 2000)
+    setTimeout(() => router.push('/member-login'), 2000)
   } catch (e) {
     error.value = e.response?.data?.message ?? 'エラーが発生しました'
   } finally {
