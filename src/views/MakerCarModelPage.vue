@@ -1,94 +1,105 @@
 <template>
-    <div class="container landing-page">
-        <header class="header-nav">
-            <a href="#">中古車</a>
-            <a href="#">輸入車</a>
-            <a href="#">中古車販売店</a>
-        </header>
+    <div class="maker-wrapper">
+        <AppHeader />
 
         <main>
             <section class="hero">
-                <h1>{{ manufacturerName }}のページ</h1>
-                <p>サイトの内容や情報を伝え、続きへ誘導したくさせるサブ説明文...</p>
-                <div class="hero-image" :style="{ backgroundImage: 'url(/hero-bg.jpg)' }"></div>
+                <div class="hero__inner">
+                    <p class="hero__label">MAKER / CAR MODEL</p>
+                    <h1 class="hero__title">{{ manufacturerName }}</h1>
+                    <p class="hero__sub">サイトの内容や情報を伝え、続きへ誘導したくさせるサブ説明文...</p>
+                </div>
+                <div class="hero__bg" :style="{ backgroundImage: 'url(/hero-bg.jpg)' }"></div>
             </section>
 
             <section class="search-section">
-                <h3 class="title5">メーカー・車名から中古車検索:車名一覧（{{ manufacturerName }}）</h3>
-                <h2>{{ manufacturerName }}の中古車</h2>
-            </section>
+                <div class="section-header">
+                    <p class="section-label">CAR MODEL LIST</p>
+                    <h2 class="section-title">{{ manufacturerName }}の中古車</h2>
+                </div>
 
-            <section class="search-section">
-                <!-- タブメニュー -->
-                <div class="scrollBox">
-                    <ul class="scrollBox__barTab">
-                        <li 
-                            v-for="group in displayGroups" 
-                            :key="group.key" 
-                            class="scrollBox__barTab__list"
+                <div class="tab-scroll">
+                    <ul class="tab-list">
+                        <li
+                            v-for="group in displayGroups"
+                            :key="group.key"
+                            class="tab-list__item"
                         >
-                            <a 
-                                v-if="group.items.length > 0" 
+                            <a
+                                v-if="group.items.length > 0"
                                 :href="`#${group.key}`"
+                                class="tab-list__link tab-list__link--active"
                             >
                                 {{ group.label }}
                             </a>
-                            <span v-else>{{ group.label }}</span>
+                            <span
+                                v-else
+                                class="tab-list__link tab-list__link--disabled"
+                            >
+                                {{ group.label }}
+                            </span>
                         </li>
                     </ul>
                 </div>
-                
-                <br />
-                <!-- 車種一覧 -->
-                <div id="carNameList_LE" class="shashuList">
-                    <!-- 各行ごとに表示 -->
-                    <template v-for="groupData in displayGroups" :key="groupData.key">
-                        <!-- データがある行だけ表示 -->
-                        <div v-if="groupData.items.length > 0">
-                            <!-- セクションタイトル -->
-                            <div :id="groupData.key" class="shashuList__categoryTitle js-shashuList_category">
-                                <h2 class="title5">{{ groupData.label }}</h2>
-                            </div>
 
-                            <!-- 3つずつグループ化して表示 -->
-                            <div 
-                                v-for="(chunk, chunkIndex) in chunkArray(groupData.items, 3)" 
-                                :key="`${groupData.key}-${chunkIndex}`" 
-                                class="shashuList__category"
+                <div class="car-list">
+                    <template v-for="groupData in displayGroups" :key="groupData.key">
+                        <div v-if="groupData.items.length > 0" class="car-group">
+                            <div :id="groupData.key" class="car-group__header">
+                                <h2 class="car-group__title">{{ groupData.label }}</h2>
+                            </div>
+                            <div
+                                v-for="(chunk, chunkIndex) in chunkArray(groupData.items, ITEMS_PER_ROW)"
+                                :key="`${groupData.key}-${chunkIndex}`"
+                                class="car-group__row"
                             >
-                                <!-- 各車種アイテム -->
-                                <div 
-                                    v-for="item in chunk" 
-                                    :key="item.seriesId" 
-                                    class="shashuList__category__item"
+                                <div
+                                    v-for="item in chunk"
+                                    :key="item.seriesId"
+                                    class="car-item"
                                 >
-                                    <a :data-id="`main_${item.seriesName}_nn`" href="">
-                                        <img 
-                                            class="js-lazy" 
-                                            src="" 
-                                            width="180" 
-                                            height="135" 
-                                            :alt="`${item.seriesName}の中古車`" 
-                                            style="display: inline;"
+                                    <a
+                                        :data-id="`main_${item.seriesName}_nn`"
+                                        href=""
+                                        class="car-item__image-link"
+                                    >
+                                        <img
+                                            class="car-item__image"
+                                            src=""
+                                            width="180"
+                                            height="135"
+                                            :alt="`${item.seriesName}の中古車`"
                                         >
                                     </a>
-                                    <input 
-                                        type="checkbox" 
-                                        name="CARC[]" 
-                                        :id="`car${item.seriesId}_nn`" 
-                                        :value="item.seriesId" 
-                                        class="js-carcCheckbox" 
-                                        tabindex="1"
-                                    >
-                                    <label :for="`car${item.seriesId}_nn`" class="label--checkbox">
-                                        <a :data-id="`main_${item.seriesName}_nn`" href="">
-                                            {{ item.seriesName }}
-                                            <span class="subText">
-                                                ({{ item.count || 0 }})
-                                            </span>
+                                    <div class="car-item__body">
+                                        <input
+                                            type="checkbox"
+                                            name="CARC[]"
+                                            :id="`car${item.seriesId}_nn`"
+                                            :value="item.seriesId"
+                                            class="car-item__checkbox"
+                                            tabindex="1"
+                                        >
+                                        <label
+                                            :for="`car${item.seriesId}_nn`"
+                                            class="car-item__label"
+                                        >
+                                            <a
+                                                :data-id="`main_${item.seriesName}_nn`"
+                                                href=""
+                                                class="car-item__name"
+                                            >
+                                                {{ item.seriesName }}
+                                                <span class="car-item__count">({{ item.count || 0 }})</span>
+                                            </a>
+                                        </label>
+                                        <a
+                                            :href="`/catalog/${manufacturerName.toLowerCase()}/${item.seriesName.toLowerCase()}/`"
+                                            class="car-item__catalog"
+                                        >
+                                            カタログ
                                         </a>
-                                    </label>
-                                    <p><a :href="`/catalog/${manufacturerName.toLowerCase()}/${item.seriesName.toLowerCase()}/`">カタログ</a></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -100,17 +111,17 @@
 </template>
 
 <script setup>
-import '@/assets/common.css'
-import '@/assets/makerCar.css'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import '@/assets/components.css'
+import AppHeader from '@/components/Common/AppHeader.vue'
 
-const route = useRoute()
+const route            = useRoute()
 const manufacturerName = route.params.manufacturerName
+const ITEMS_PER_ROW = ref(3)
 
-// 車両一覧
-const groupedByInitial = ref({})
+const groupedByInitial             = ref({})
 const electManufacturerListLoading = ref(false)
 
 const fetchEctManufacturerLists = async () => {
@@ -119,18 +130,14 @@ const fetchEctManufacturerLists = async () => {
         const { data } = await axios.get('http://laravel11practice.local:81/api/SelectManufacturers', {
             params: {
                 manufacturerName: manufacturerName,
-                grouped: true  // グルーピングを要求
+                grouped: true
             },
             headers: {
                 'Authorization': 'Bearer token',
                 'Content-Type': 'application/json'
             },
         })
-        
-        // グルーピングデータを取得
         groupedByInitial.value = data.data.groupedByInitial || {}
-        
-        console.log('groupedByInitial loaded:', groupedByInitial.value)
     } catch (error) {
         console.error('API Error:', error)
         console.error('Error details:', error.response)
@@ -139,7 +146,6 @@ const fetchEctManufacturerLists = async () => {
     }
 }
 
-// 3つずつチャンク化する関数
 const chunkArray = (array, size) => {
     const result = []
     for (let i = 0; i < array.length; i += size) {
@@ -148,24 +154,30 @@ const chunkArray = (array, size) => {
     return result
 }
 
-// 表示用のグループ定義（順序を保持）
-const displayGroups = computed(() => {
-    return [
-        { key: 'EN', label: '英数', items: groupedByInitial.value.EN || [] },
-        { key: 'AA', label: 'ア行', items: groupedByInitial.value.AA || [] },
-        { key: 'KA', label: 'カ行', items: groupedByInitial.value.KA || [] },
-        { key: 'SA', label: 'サ行', items: groupedByInitial.value.SA || [] },
-        { key: 'TA', label: 'タ行', items: groupedByInitial.value.TA || [] },
-        { key: 'NA', label: 'ナ行', items: groupedByInitial.value.NA || [] },
-        { key: 'HA', label: 'ハ行', items: groupedByInitial.value.HA || [] },
-        { key: 'MA', label: 'マ行', items: groupedByInitial.value.MA || [] },
-        { key: 'YA', label: 'ヤ行', items: groupedByInitial.value.YA || [] },
-        { key: 'RA', label: 'ラ行', items: groupedByInitial.value.RA || [] },
-        { key: 'WA', label: 'ワ行', items: groupedByInitial.value.WA || [] },
-    ]
-})
+const displayGroups = computed(() => [
+    { key: 'EN', label: '英数', items: groupedByInitial.value.EN || [] },
+    { key: 'AA', label: 'ア行', items: groupedByInitial.value.AA || [] },
+    { key: 'KA', label: 'カ行', items: groupedByInitial.value.KA || [] },
+    { key: 'SA', label: 'サ行', items: groupedByInitial.value.SA || [] },
+    { key: 'TA', label: 'タ行', items: groupedByInitial.value.TA || [] },
+    { key: 'NA', label: 'ナ行', items: groupedByInitial.value.NA || [] },
+    { key: 'HA', label: 'ハ行', items: groupedByInitial.value.HA || [] },
+    { key: 'MA', label: 'マ行', items: groupedByInitial.value.MA || [] },
+    { key: 'YA', label: 'ヤ行', items: groupedByInitial.value.YA || [] },
+    { key: 'RA', label: 'ラ行', items: groupedByInitial.value.RA || [] },
+    { key: 'WA', label: 'ワ行', items: groupedByInitial.value.WA || [] },
+])
 
 onMounted(() => {
     fetchEctManufacturerLists()
 })
 </script>
+
+<style scoped>
+.car-group__row {
+    display: grid;
+    grid-template-columns: repeat(v-bind(ITEMS_PER_ROW), 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+</style>

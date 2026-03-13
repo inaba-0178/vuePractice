@@ -42,6 +42,7 @@
           </button>
           <router-link to="/forgot-password" class="back-link">パスワードをお忘れの方</router-link>
           <router-link to="/register" class="back-link">会員登録はこちら</router-link>
+          <router-link to="/" class="back-link">トップページに戻る</router-link>
         </div>
       </div>
     </div>

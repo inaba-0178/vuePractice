@@ -1,89 +1,63 @@
 <template>
-    <div class="container landing-page">
-        <header class="header-nav">
-            <a href="#">中古車</a>
-            <a href="#">輸入車</a>
-            <a href="#">中古車販売店</a>
-            <template v-if="auth.isLoggedIn">
-                <router-link :to="{ name: 'chat' }">チャット</router-link>
-                <a href="#" @click.prevent="handleLogout">ログアウト</a>
-            </template>
-            <template v-else>
-                <router-link :to="{ name: 'member-login' }">ログイン</router-link>
-            </template>
-        </header>
+    <div class="landing-wrapper">
+        <AppHeader />
 
         <main>
-            <section class="hero">
-                <h1>ランディングページのタイトル</h1>
-                <p>サイトの内容や情報を伝え、続きへ誘導したくさせるサブ説明文...</p>
-                <div class="hero-image" :style="{ backgroundImage: 'url(/hero-bg.jpg)' }"></div>
+            <!-- ヒーロー -->
+            <section class="hero hero--tall">
+                <div class="hero__inner">
+                    <p class="hero__label">PREMIUM CAR SEARCH</p>
+                    <h1 class="hero__title hero__title--large">ランディングページのタイトル</h1>
+                    <p class="hero__sub">サイトの内容や情報を伝え、続きへ誘導したくさせるサブ説明文...</p>
+                </div>
+                <div class="hero__bg" :style="{ backgroundImage: 'url(/hero-bg.jpg)' }"></div>
             </section>
 
+            <!-- メーカーから探す -->
             <section class="search-section">
-                <h2 class="title3">中古車を探す</h2>
-                <h3 class="title5">メーカーから探す</h3>
+                <div class="section-header">
+                    <p class="section-label">SEARCH BY MAKER</p>
+                    <h2 class="section-title">メーカーから探す</h2>
+                </div>
 
-                <div class="makerNav">
-                    <div class="makerNav__bar">
-                        <div class="makerNav__head">
-                            <a href="" class="makerNav__anchor makerNav__anchor--head">
-                                <p class="makerNav__title">国産<br>中古車</p>
-                                <div class="makerNav__all">
-                                    <p class="makerNav__allText">すべて見る</p>
-                                </div>
-                            </a>
+                <div class="maker-nav">
+                    <div class="maker-nav__block">
+                        <div class="maker-nav__head">
+                            <p class="maker-nav__head-title">国産<br>中古車</p>
+                            <a href="" class="maker-nav__all">すべて見る</a>
                         </div>
-
-                        <ul class="makerNav__list">
-                            <li v-for="brand in japaneseBrands" :key="brand.code" class="makerNav__item">
-                                <!-- router-linkを使った方法 -->
-                                <router-link 
-                                    :to="{ 
-                                        name: 'MakerCarModel', 
-                                        params: { 
-                                            manufacturerName: brand.name 
-                                        } 
-                                    }"
-                                    :title="brand.name" 
-                                    class="makerNav__anchor"
+                        <ul class="maker-nav__list">
+                            <li v-for="brand in japaneseBrands" :key="brand.code" class="maker-nav__item">
+                                <router-link
+                                    :to="{ name: 'MakerCarModel', params: { manufacturerName: brand.name } }"
+                                    :title="brand.name"
+                                    class="maker-nav__anchor"
                                 >
-                                    <div class="makerNav__frame">
-                                        <i class="makerNav__icon makerImg" :style="{ '--icon-image': `url(${brand.imageFilePath})` }"></i>
+                                    <div class="maker-nav__frame">
+                                        <i class="maker-nav__icon" :style="{ '--icon-image': `url(${brand.imageFilePath})` }"></i>
                                     </div>
-                                    <p class="makerNav__name">{{ brand.displayName }}</p>
+                                    <p class="maker-nav__name">{{ brand.displayName }}</p>
                                 </router-link>
                             </li>
                         </ul>
                     </div>
 
-                    <div class="makerNav__bar">
-                        <div class="makerNav__head">
-                            <a href="" class="makerNav__anchor makerNav__anchor--head">
-                                <p class="makerNav__title">輸入<br>中古車</p>
-                                <div class="makerNav__all">
-                                    <p class="makerNav__allText">すべて見る</p>
-                                </div>
-                            </a>
+                    <div class="maker-nav__block">
+                        <div class="maker-nav__head">
+                            <p class="maker-nav__head-title">輸入<br>中古車</p>
+                            <a href="" class="maker-nav__all">すべて見る</a>
                         </div>
-
-                        <ul class="makerNav__list">
-                            <li v-for="brand in abroadBrands" :key="brand.code" class="makerNav__item">
-                                <router-link 
-                                    :to="{ 
-                                        name: 'MakerCarModel', 
-                                        params: { 
-                                            manufacturerCode: brand.code,
-                                            manufacturerName: brand.name 
-                                        } 
-                                    }"
-                                    :title="brand.name" 
-                                    class="makerNav__anchor"
+                        <ul class="maker-nav__list">
+                            <li v-for="brand in abroadBrands" :key="brand.code" class="maker-nav__item">
+                                <router-link
+                                    :to="{ name: 'MakerCarModel', params: { manufacturerCode: brand.code, manufacturerName: brand.name } }"
+                                    :title="brand.name"
+                                    class="maker-nav__anchor"
                                 >
-                                    <div class="makerNav__frame">
-                                        <i class="makerNav__icon makerImg" :style="{ '--icon-image': `url(${brand.imageFilePath})` }"></i>
+                                    <div class="maker-nav__frame">
+                                        <i class="maker-nav__icon" :style="{ '--icon-image': `url(${brand.imageFilePath})` }"></i>
                                     </div>
-                                    <p class="makerNav__name">{{ brand.displayName }}</p>
+                                    <p class="maker-nav__name">{{ brand.displayName }}</p>
                                 </router-link>
                             </li>
                         </ul>
@@ -91,43 +65,38 @@
                 </div>
             </section>
 
+            <!-- ボディタイプから探す -->
             <section class="search-section">
-                <h2>ボディタイプから検索</h2>
-                <div class="searchPatternWrap">
-                    <ul class="searchPatternWrap__item">
+                <div class="section-header">
+                    <p class="section-label">SEARCH BY BODY TYPE</p>
+                    <h2 class="section-title">ボディタイプから検索</h2>
+                </div>
+                <div class="body-type-wrap">
+                    <ul class="body-type-list">
                         <li
                             v-for="brand in bodyTypes1"
                             :key="brand.name"
+                            class="body-type-item"
                             :style="{ backgroundImage: `url(${brand.iconImage})` }"
                         >
                             <router-link
-                                :to="{
-                                    name: 'BodyTypeModel',
-                                    params: {
-                                        Name: brand.code
-                                    }
-                                }"
-                                class="shashuBodyType type_car"
+                                :to="{ name: 'BodyTypeModel', params: { Name: brand.code } }"
+                                class="body-type-link"
                             >
                                 {{ brand.name }}
                             </router-link>
                         </li>
                     </ul>
-
-                    <ul class="searchPatternWrap__item">
+                    <ul class="body-type-list">
                         <li
                             v-for="brand in bodyTypes2"
                             :key="brand.name"
+                            class="body-type-item"
                             :style="{ backgroundImage: `url(${brand.iconImage})` }"
                         >
                             <router-link
-                                :to="{
-                                    name: 'BodyTypeModel',
-                                    params: {
-                                        Name: brand.name
-                                    }
-                                }"
-                                class="shashuBodyType type_car"
+                                :to="{ name: 'BodyTypeModel', params: { Name: brand.name } }"
+                                class="body-type-link"
                             >
                                 {{ brand.name }}
                             </router-link>
@@ -135,99 +104,86 @@
                     </ul>
                 </div>
             </section>
-            
-            <div class="searchPattern__area">
-                <section>
-                    <br />
-                    <h3 class="title5">都道府県から探す</h3>
 
-                    <div class="searchPatternWrap searchPatternWrap--area">
-
-                        <div class="searchArea">
-                            <dl class="searchArea__list" v-for="region in leftRegions" :key="region.name">
-                                    <dt>
-                                        <a href="">{{region.name}}</a>
-                                    </dt>
-                                    <dd v-for="pref in region.prefectures">
-                                        <a href="">{{pref.name}}</a>
-                                    </dd>
-                            </dl>
-                        </div>
-
-                        <div class="searchPatternArea">
-                            <dl class="searchArea__list" v-for="region in rightRegions" :key="region.name">
-                                    <dt>
-                                        <a href="">{{region.name}}</a>
-                                    </dt>
-                                    <dd v-for="pref in region.prefectures">
-                                        <a href="">{{pref.name}}</a>
-                                    </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div class="searchPattern__choosy">
-                <section>
-                    <h3 class="title5">こだわり条件から探す</h3>
-
-                    <ul class="searchPatternWrap searchPatternWrap--choosy">
-                        <li class="searchPatternWrap__list">
-                            <dl>
-                                <dt>価格から探す</dt>
-                                <dd  v-for="price in priceList">
-                                    <a href="">{{ price.name }}</a>
-                                </dd>
-                            </dl>
-                        </li>
-                        <li class="searchPatternWrap__list">
-                            <dl>
-                                <dt>走行距離から探す</dt>
-                                <dd  v-for="mileage in mileageList">
-                                    <a href="">{{ mileage.name }}</a>
-                                </dd>
-                            </dl>
-                        </li>
-                        <li class="searchPatternWrap__list">
-                            <dl>
-                                <dt>乗車定員から探す</dt>
-                                <dd  v-for="ridingCapacity in ridingCapacityList">
-                                    <a href="">{{ ridingCapacity.name }}</a>
-                                </dd>
-                            </dl>
-                        </li>
-                        <li class="searchPatternWrap__list">
-                            <dl>
-                                <dt>排気量から探す</dt>
-                                <dd  v-for="displacement in displacementList">
-                                    <a href="">{{ displacement.name }}</a>
-                                </dd>
-                            </dl>
-                        </li>
-                    </ul>
-                </section>
-            </div>
+            <!-- 都道府県から探す -->
             <section class="search-section">
-                <div class="searchArea">
-                    
+                <div class="section-header">
+                    <p class="section-label">SEARCH BY AREA</p>
+                    <h2 class="section-title">都道府県から探す</h2>
+                </div>
+                <div class="area-wrap">
+                    <div class="area-col">
+                        <dl class="area-list" v-for="region in leftRegions" :key="region.name">
+                            <dt class="area-list__region"><a href="">{{ region.name }}</a></dt>
+                            <dd class="area-list__pref" v-for="pref in region.prefectures" :key="pref.name">
+                                <a href="">{{ pref.name }}</a>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="area-col">
+                        <dl class="area-list" v-for="region in rightRegions" :key="region.name">
+                            <dt class="area-list__region"><a href="">{{ region.name }}</a></dt>
+                            <dd class="area-list__pref" v-for="pref in region.prefectures" :key="pref.name">
+                                <a href="">{{ pref.name }}</a>
+                            </dd>
+                        </dl>
+                    </div>
                 </div>
             </section>
-            <!-- 他のセクションも同様 -->
+
+            <!-- こだわり条件から探す -->
+            <section class="search-section">
+                <div class="section-header">
+                    <p class="section-label">SEARCH BY CONDITION</p>
+                    <h2 class="section-title">こだわり条件から探す</h2>
+                </div>
+                <div class="choosy-wrap">
+                    <div class="choosy-item">
+                        <dl>
+                            <dt class="choosy-item__title">価格から探す</dt>
+                            <dd class="choosy-item__value" v-for="price in priceList" :key="price.name">
+                                <a href="">{{ price.name }}</a>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="choosy-item">
+                        <dl>
+                            <dt class="choosy-item__title">走行距離から探す</dt>
+                            <dd class="choosy-item__value" v-for="mileage in mileageList" :key="mileage.name">
+                                <a href="">{{ mileage.name }}</a>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="choosy-item">
+                        <dl>
+                            <dt class="choosy-item__title">乗車定員から探す</dt>
+                            <dd class="choosy-item__value" v-for="ridingCapacity in ridingCapacityList" :key="ridingCapacity.name">
+                                <a href="">{{ ridingCapacity.name }}</a>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="choosy-item">
+                        <dl>
+                            <dt class="choosy-item__title">排気量から探す</dt>
+                            <dd class="choosy-item__value" v-for="displacement in displacementList" :key="displacement.name">
+                                <a href="">{{ displacement.name }}</a>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 </template>
 
 <script setup>
-    import '@/assets/common.css'
-    import '@/assets/landingpage.css'
-
     import { ref, watch, onMounted, computed } from 'vue'
     import axios from 'axios'
-    import { useAuthStore } from '@/stores/auth'
+    
     import { useRouter } from 'vue-router'
+    import AppHeader from '@/components/Common/AppHeader.vue'
 
-    const auth   = useAuthStore()
+    
     const router = useRouter()
 
     const handleLogout = async () => {
@@ -250,7 +206,6 @@
                     url: region.query_param ? `/prefecture/${region.query_param}` : ""
                 }))
             }))
-            console.log('Regions loaded:', regions.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
@@ -258,50 +213,41 @@
         }
     }
 
-    // 都道府県　左側
-    const leftRegions = computed(() => regions.value.slice(0, 5))
-    // 都道府県　右側
+    const leftRegions  = computed(() => regions.value.slice(0, 5))
     const rightRegions = computed(() => regions.value.slice(5))
     fetchRegions()
 
-    // 価格一覧
-    const priceLists = ref([])
-    const priceListLoading = ref(false)
-
+    const priceLists          = ref([])
+    const priceListLoading    = ref(false)
     const fetchPriceLists = async () => {
         priceListLoading.value = true
         try {
             const { data } = await axios.get('http://laravel11practice.local:81/api/Prices')
             priceLists.value = data.data.PriceList.map(PriceList => ({
-                name: PriceList.name,
-                max_amount: PriceList.max_amount,
+                name:         PriceList.name,
+                max_amount:   PriceList.max_amount,
                 is_unlimited: PriceList.is_unlimited,
             }))
-            console.log('PriceList loaded:', PriceLists.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
             loading.value = false
         }
     }
-
     const priceList = computed(() => priceLists.value)
     fetchPriceLists()
-    
-    //走行距離一覧
-    const mileageLists = ref([])
-    const mileageListLoading = ref(false)
 
+    const mileageLists       = ref([])
+    const mileageListLoading = ref(false)
     const fetchmileageLists = async () => {
         mileageListLoading.value = true
         try {
             const { data } = await axios.get('http://laravel11practice.local:81/api/Mileages')
             mileageLists.value = data.data.MileageList.map(MileageList => ({
-                name: MileageList.name,
-                max_amount: MileageList.max_amount,
+                name:         MileageList.name,
+                max_amount:   MileageList.max_amount,
                 is_unlimited: MileageList.is_unlimited,
             }))
-            console.log('MileageList loaded:', MileageLists.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
@@ -311,20 +257,17 @@
     const mileageList = computed(() => mileageLists.value)
     fetchmileageLists()
 
-    //排気量一覧
-    const displacementLists = ref([])
+    const displacementLists       = ref([])
     const displacementListLoading = ref(false)
-
     const fetchdisplacementLists = async () => {
         displacementListLoading.value = true
         try {
             const { data } = await axios.get('http://laravel11practice.local:81/api/Displacements')
             displacementLists.value = data.data.DisplacementList.map(DisplacementList => ({
-                name: DisplacementList.name,
-                max_amount: DisplacementList.max_amount,
+                name:         DisplacementList.name,
+                max_amount:   DisplacementList.max_amount,
                 is_unlimited: DisplacementList.is_unlimited,
             }))
-            console.log('DisplacementList loaded:', DisplacementLists.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
@@ -334,20 +277,17 @@
     const displacementList = computed(() => displacementLists.value)
     fetchdisplacementLists()
 
-    //乗車定員一覧
-    const ridingCapacityLists = ref([])
+    const ridingCapacityLists       = ref([])
     const ridingCapacityListLoading = ref(false)
-
     const fetchRidingCapacityLists = async () => {
         ridingCapacityListLoading.value = true
         try {
             const { data } = await axios.get('http://laravel11practice.local:81/api/RidingCapacities')
             ridingCapacityLists.value = data.data.RidingCapacityList.map(RidingCapacityList => ({
-                name: RidingCapacityList.name,
-                max_amount: RidingCapacityList.max_amount,
+                name:         RidingCapacityList.name,
+                max_amount:   RidingCapacityList.max_amount,
                 is_unlimited: RidingCapacityList.is_unlimited,
             }))
-            console.log('RidingCapacityList loaded:', RidingCapacityLists.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
@@ -357,62 +297,296 @@
     const ridingCapacityList = computed(() => ridingCapacityLists.value)
     fetchRidingCapacityLists()
 
-    //メーカー情報一覧
-    const featuredBrandLists = ref([])
+    const featuredBrandLists       = ref([])
     const featuredBrandListLoading = ref(false)
-
     const fetchfeaturedBrandLists = async () => {
         featuredBrandListLoading.value = true
         try {
             const { data } = await axios.get('http://laravel11practice.local:81/api/FeaturedBrands')
             featuredBrandLists.value = data.data.ManufacturerInfo.map(ManufacturerInfo => ({
-                name: ManufacturerInfo.name,
-                displayName: ManufacturerInfo.displayName,
-                position: ManufacturerInfo.position,
-                code: ManufacturerInfo.code,
+                name:          ManufacturerInfo.name,
+                displayName:   ManufacturerInfo.displayName,
+                position:      ManufacturerInfo.position,
+                code:          ManufacturerInfo.code,
                 imageFilePath: ManufacturerInfo.manufacturerImageFilePath,
-                imageAltText: ManufacturerInfo.manufacturerImageAltText,
+                imageAltText:  ManufacturerInfo.manufacturerImageAltText,
             }))
-            console.log('featuredBrandList loaded:', featuredBrandLists.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
             loading.value = false
         }
     }
-    const featuredBrandList = computed(() => featuredBrandLists.value)
-    // 国産中古車欄
     const japaneseBrands = computed(() => featuredBrandLists.value.slice(0, 9))
-    // 輸入中古車欄
-    const abroadBrands = computed(() => featuredBrandLists.value.slice(9))
+    const abroadBrands   = computed(() => featuredBrandLists.value.slice(9))
     fetchfeaturedBrandLists()
-    
-    //ボディタイプ情報一覧
-    const featuredBodyTypeLists = ref([])
+
+    const featuredBodyTypeLists       = ref([])
     const featuredBodyTypeListLoading = ref(false)
     const fetchFeaturedBodyTypeLists = async () => {
         featuredBodyTypeListLoading.value = true
         try {
             const { data } = await axios.get('http://laravel11practice.local:81/api/FeaturedBodyTypes')
             featuredBodyTypeLists.value = data.data.BodyTypeInfo.map(BodyTypeInfo => ({
-                name: BodyTypeInfo.name,
-                position: BodyTypeInfo.position,
-                code: BodyTypeInfo.code,
+                name:          BodyTypeInfo.name,
+                position:      BodyTypeInfo.position,
+                code:          BodyTypeInfo.code,
                 imageFilePath: BodyTypeInfo.bodyTypeImageFilePath,
-                imageAltText: BodyTypeInfo.bodyTypeImageAltText,
+                imageAltText:  BodyTypeInfo.bodyTypeImageAltText,
             }))
-            console.log('featuredBodyTypeList loaded:', featuredBodyTypeLists.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
             loading.value = false
         }
     }
-    const featuredBodyTypeList = computed(() => featuredBodyTypeLists.value)
-    // ボディタイプ上段
     const bodyTypes1 = computed(() => featuredBodyTypeLists.value.slice(0, 8))
-    // ボディタイプ下段
     const bodyTypes2 = computed(() => featuredBodyTypeLists.value.slice(8))
     fetchFeaturedBodyTypeLists()
-
 </script>
+
+<style scoped>
+/* メーカーナビ */
+.maker-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.maker-nav__block {
+    border: 1px solid #222;
+    border-radius: 4px;
+    padding: 32px;
+}
+
+.maker-nav__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #222;
+}
+
+.maker-nav__head-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: 0.1em;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.maker-nav__all {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    color: #dc5078;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.maker-nav__all:hover {
+    opacity: 0.7;
+}
+
+.maker-nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.maker-nav__item {
+    flex: 0 0 calc(11.11% - 16px);
+}
+
+.maker-nav__anchor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.maker-nav__anchor:hover {
+    opacity: 0.7;
+}
+
+.maker-nav__frame {
+    width: 56px;
+    height: 56px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.maker-nav__icon {
+    display: block;
+    width: 36px;
+    height: 36px;
+    background-image: var(--icon-image);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.maker-nav__name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    color: #888;
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-align: center;
+}
+
+/* ボディタイプ */
+.body-type-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.body-type-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.body-type-item {
+    flex: 0 0 calc(12.5% - 12px);
+    border: 1px solid #222;
+    border-radius: 4px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.body-type-link {
+    display: block;
+    padding: 24px 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    letter-spacing: 0.05em;
+    transition: background 0.2s ease;
+}
+
+.body-type-link:hover {
+    background: rgba(220, 80, 120, 0.4);
+}
+
+/* 都道府県 */
+.area-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.area-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.area-list {
+    margin: 0;
+    padding: 0;
+}
+
+.area-list__region {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #dc5078;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+.area-list__region a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.area-list__region a:hover {
+    opacity: 0.7;
+}
+
+.area-list__pref {
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+}
+
+.area-list__pref a {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: #666;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+}
+
+.area-list__pref a:hover {
+    color: #ccc;
+}
+
+/* こだわり条件 */
+.choosy-wrap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.choosy-item {
+    border: 1px solid #222;
+    border-radius: 4px;
+    padding: 24px;
+}
+
+.choosy-item__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #dc5078;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #222;
+}
+
+.choosy-item__value {
+    margin: 0 0 8px;
+}
+
+.choosy-item__value a {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: #666;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+}
+
+.choosy-item__value a:hover {
+    color: #dc5078;
+}
+</style>
