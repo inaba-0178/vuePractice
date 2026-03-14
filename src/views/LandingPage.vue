@@ -74,10 +74,10 @@
                 <div class="body-type-wrap">
                     <ul class="body-type-list">
                         <li
-                            v-for="brand in bodyTypes1"
+                            v-for="brand in bodyTypesTop"
                             :key="brand.name"
                             class="body-type-item"
-                            :style="{ backgroundImage: `url(${brand.iconImage})` }"
+                            :style="{ backgroundImage: `url(${brand.imageFilePath})` }"
                         >
                             <router-link
                                 :to="{ name: 'BodyTypeModel', params: { Name: brand.code } }"
@@ -89,10 +89,10 @@
                     </ul>
                     <ul class="body-type-list">
                         <li
-                            v-for="brand in bodyTypes2"
+                            v-for="brand in bodyTypesBottom"
                             :key="brand.name"
                             class="body-type-item"
-                            :style="{ backgroundImage: `url(${brand.iconImage})` }"
+                            :style="{ backgroundImage: `url(${brand.imageFilePath})` }"
                         >
                             <router-link
                                 :to="{ name: 'BodyTypeModel', params: { Name: brand.name } }"
@@ -340,8 +340,8 @@
             loading.value = false
         }
     }
-    const bodyTypes1 = computed(() => featuredBodyTypeLists.value.slice(0, 8))
-    const bodyTypes2 = computed(() => featuredBodyTypeLists.value.slice(8))
+    const bodyTypesTop = computed(() => featuredBodyTypeLists.value.slice(0, 8))
+    const bodyTypesBottom = computed(() => featuredBodyTypeLists.value.slice(8))
     fetchFeaturedBodyTypeLists()
 </script>
 
