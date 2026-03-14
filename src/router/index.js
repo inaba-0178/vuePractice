@@ -15,6 +15,9 @@ import MypageProfile from '@/views/Mypage/MypageProfile.vue'
 import MypageEdit    from '@/views/Mypage/MypageEdit.vue'
 import MypageEmailChange from '@/views/Mypage/MypageEmailChange.vue'
 import MypagePasswordChange from '@/views/Mypage/MypagePasswordChange.vue'
+import CarAreaSelect from '@/views/Car/CarAreaSelect.vue'
+import CarSelectAreaList from '@/views/Car/CarSelectAreaList.vue'
+
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -93,8 +96,16 @@ const routes = [
       component: MypagePasswordChange,
     },
   ]},
-  
-
+  {
+    path: '/car/area-select',
+    name: 'car-area-select',
+    component: CarAreaSelect
+  },
+  {
+    path: '/car/select-area-list',
+    name: 'car-select-area-list',
+    component: CarSelectAreaList
+  },
 ]
 
 const router = createRouter({

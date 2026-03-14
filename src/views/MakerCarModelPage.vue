@@ -60,7 +60,7 @@
                                 >
                                     <a
                                         :data-id="`main_${item.seriesName}_nn`"
-                                        href=""
+                                        @click.prevent="goToAreaSelect(item.seriesId)"
                                         class="car-item__image-link"
                                     >
                                         <img
@@ -86,11 +86,11 @@
                                         >
                                             <a
                                                 :data-id="`main_${item.seriesName}_nn`"
-                                                href=""
+                                                @click.prevent="goToAreaSelect(item.seriesId)"
                                                 class="car-item__name"
                                             >
                                                 {{ item.seriesName }}
-                                                <span class="car-item__count">({{ item.count || 0 }})</span>
+                                                <span class="car-item__count">({{ stockCounts[item.seriesId] ?? 0 }})</span>
                                             </a>
                                         </label>
                                         <a
@@ -116,6 +116,15 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import '@/assets/components.css'
 import AppHeader from '@/components/Common/AppHeader.vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const goToAreaSelect = (seriesId) => {
+  router.push({
+    path: '/car/area-select',
+    query: { seriesId },
+  })
+}
 
 const route            = useRoute()
 const manufacturerName = route.params.manufacturerName
@@ -138,6 +147,13 @@ const fetchEctManufacturerLists = async () => {
             },
         })
         groupedByInitial.value = data.data.groupedByInitial || {}
+        
+        // fetchEctManufacturerListsのtry内、groupedByInitial取得後に追加
+        const seriesIds = Object.values(groupedByInitial.value)
+            .flat()
+            .map(item => item.seriesId)
+
+        await fetchSeriesStkCount(seriesIds)
     } catch (error) {
         console.error('API Error:', error)
         console.error('Error details:', error.response)
@@ -145,6 +161,30 @@ const fetchEctManufacturerLists = async () => {
         electManufacturerListLoading.value = false
     }
 }
+
+// 追加
+const stockCounts = ref({})
+
+const fetchSeriesStkCount = async (seriesIds) => {
+    try {
+        const { data } = await axios.get('http://laravel11practice.local:81/api/SeriesStkCount', {
+            params: {
+                'seriesIds[]': seriesIds
+            },
+            headers: {
+                'Authorization': 'Bearer token',
+                'Content-Type': 'application/json'
+            },
+        })
+        stockCounts.value = Object.fromEntries(
+            data.data.map(item => [item.seriesId, item.num])
+        )
+    } catch (error) {
+        console.error('API Error:', error)
+    }
+}
+
+
 
 const chunkArray = (array, size) => {
     const result = []
