@@ -17,7 +17,7 @@ import MypageEmailChange from '@/views/Mypage/MypageEmailChange.vue'
 import MypagePasswordChange from '@/views/Mypage/MypagePasswordChange.vue'
 import CarAreaSelect from '@/views/Car/CarAreaSelect.vue'
 import CarSelectAreaList from '@/views/Car/CarSelectAreaList.vue'
-
+import CarDetail from '@/views/Car/CarDetail.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -105,6 +105,11 @@ const routes = [
     path: '/car/select-area-list',
     name: 'car-select-area-list',
     component: CarSelectAreaList
+  },
+  {
+    path: '/cars/:id',
+    name: 'CarDetail',
+    component: CarDetail,
   },
 ]
 
