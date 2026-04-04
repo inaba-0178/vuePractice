@@ -48,19 +48,34 @@
           </div>
 
           <!-- サムネイル一覧 -->
-          <div class="car-detail__thumbnails">
-            <div
-              v-for="(img, idx) in filteredImages"
-              :key="img.id"
-              class="car-detail__thumbnail"
-              :class="{ 'is-active': currentImageIndex === idx }"
-              @click="selectImage(idx)"
-            >
-              <img v-if="img.imageUrl" :src="imageBaseUrl + img.imageUrl" :alt="`サムネイル${idx + 1}`" />
-              <div v-else class="car-detail__thumbnail-noimg">NO IMAGE</div>
+          <div class="car-detail__thumbnails-wrapper">
+            <button
+              class="car-detail__thumb-nav"
+              :disabled="thumbPage === 0"
+              @click="thumbPage = Math.max(0, thumbPage - 1)"
+            >‹</button>
+
+            <div class="car-detail__thumbnails">
+              <div
+                v-for="(img, idx) in thumbImages"
+                :key="img.id"
+                class="car-detail__thumbnail"
+                :class="{ 'is-active': isCurrentThumb(idx) }"
+                @click="selectImage(idx)"
+              >
+                <img v-if="img.imageUrl" :src="imageBaseUrl + img.imageUrl" :alt="`サムネイル${idx + 1}`" />
+                <div v-else class="car-detail__thumbnail-noimg">NO IMAGE</div>
+              </div>
             </div>
+
+            <button
+              class="car-detail__thumb-nav"
+              :disabled="thumbPage >= totalThumbPages - 1"
+              @click="thumbPage = Math.min(totalThumbPages - 1, thumbPage + 1)"
+            >›</button>
           </div>
         </div>
+        
 
         <!-- 右：価格・ボタンエリア -->
         <div class="car-detail__price-area">
@@ -280,6 +295,18 @@
             <span class="car-detail__loan-detail-monthly">
               月々<em>{{ loan.monthly_payments.at(-1)?.amount.toLocaleString() }}</em>円
             </span>
+            <!-- ローン詳細セクションのボタン -->
+            <button class="car-detail__loan-simulator-btn" @click="showLoanSimulator = true">
+              ローンシミュレーター
+            </button>
+            <!-- モーダル -->
+            <LoanSimulatorModal
+              :show="showLoanSimulator"
+              :price="car.price"
+              :interest-rate-default="loan.interest_rate"
+              :months-options="loan.monthly_payments.map(p => p.months)"
+              @close="showLoanSimulator = false"
+            />
           </div>
 
           <!-- 詳細テーブル -->
@@ -481,6 +508,7 @@
   import { useRoute } from 'vue-router'
   import axios from 'axios'
   import ReservationCalendar from '@/components/Reservation/ReservationCalendar.vue'
+  import LoanSimulatorModal from '@/components/Loan/LoanSimulatorModal.vue'
 
   const route = useRoute()
   const carId = route.params.id
@@ -492,6 +520,7 @@
   const dealer        = ref(null)
   const loading       = ref(true)
   const isFavorite    = ref(false)
+  const showLoanSimulator = ref(false)
   const equipmentBasicOptions   = ref([])
   const equipmentSafetyOptions  = ref([])
   const equipmentEnvOptions     = ref([])
@@ -532,17 +561,41 @@
 console.log(filteredImages);
   const currentImage = computed(() => filteredImages.value[currentImageIndex.value] ?? null)
 
-  const selectImage = (idx) => { currentImageIndex.value = idx }
+  const thumbPage = ref(0)
+  const thumbPerPage = 10
 
-  const prevImage   = () => {
+  const totalThumbPages = computed(() => Math.ceil(filteredImages.value.length / thumbPerPage))
+
+  const thumbImages = computed(() => {
+    const start = thumbPage.value * thumbPerPage
+    return filteredImages.value.slice(start, start + thumbPerPage)
+  })
+
+  const selectImage = (idx) => {
+    currentImageIndex.value = thumbPage.value * thumbPerPage + idx
+  }
+
+  const isCurrentThumb = (idx) => {
+    return (thumbPage.value * thumbPerPage + idx) === currentImageIndex.value
+  }
+
+  const syncThumbPage = () => {
+    thumbPage.value = Math.floor(currentImageIndex.value / thumbPerPage)
+  }
+
+  // 既存のprevImage・nextImageを修正
+  const prevImage = () => {
     currentImageIndex.value = currentImageIndex.value === 0
       ? filteredImages.value.length - 1
       : currentImageIndex.value - 1
+    syncThumbPage()
   }
-  const nextImage   = () => {
+
+  const nextImage = () => {
     currentImageIndex.value = currentImageIndex.value === filteredImages.value.length - 1
       ? 0
       : currentImageIndex.value + 1
+    syncThumbPage()
   }
 
   // クチコミ関連
@@ -809,12 +862,14 @@ console.log(filteredImages);
 }
 
 .car-detail__thumbnails {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 4px;
 }
+
 .car-detail__thumbnail {
-  aspect-ratio: 4/3;
+  height: 54px;
   background: #111;
   border-radius: 4px;
   overflow: hidden;
@@ -1342,4 +1397,78 @@ console.log(filteredImages);
   margin: 0 0 4px;
 }
 .car-detail__loan-notes p:last-child { margin: 0; }
+
+
+.car-detail__thumbnails-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.car-detail__thumb-nav {
+  background: #dc5078;
+  border: none;
+  border-radius: 6px;
+  width: 28px;
+  height: 44px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.car-detail__thumb-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.car-detail__thumb-nav:not(:disabled):hover {
+  background: #c44068;
+}
+
+.car-detail__thumbnails {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.car-detail__thumbnail {
+  aspect-ratio: 4/3;
+  background: #111;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.car-detail__thumbnail.is-active { border-color: #dc5078; }
+.car-detail__thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.car-detail__thumbnail-noimg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #444;
+}
+
+.car-detail__loan-simulator-btn {
+  padding: 10px 20px;
+  border: 1px solid #dc5078;
+  border-radius: 4px;
+  background: transparent;
+  color: #dc5078;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.05em;
+}
+.car-detail__loan-simulator-btn:hover {
+  background: rgba(220, 80, 120, 0.1);
+}
 </style>
