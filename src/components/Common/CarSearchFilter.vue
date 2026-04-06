@@ -96,35 +96,16 @@
           <!-- 行3：価格スライダー -->
           <div class="search-filter__row search-filter__row--price">
             <div class="search-filter__field search-filter__field--full">
-              <label class="search-filter__label">
-                価格
-              </label>
-              <div class="search-filter__price-area">
-                <span class="search-filter__price-display">
-                  {{ form.priceFrom ? `${form.priceFrom}万円` : '下限なし' }}
-                </span>
-                <div class="search-filter__slider-wrap">
-                  <input
-                    type="range"
-                    v-model.number="form.priceFrom"
-                    :min="0"
-                    :max="form.priceTo || 2000"
-                    step="10"
-                    class="search-filter__slider search-filter__slider--from"
-                  />
-                  <input
-                    type="range"
-                    v-model.number="form.priceTo"
-                    :min="form.priceFrom || 0"
-                    :max="2000"
-                    step="10"
-                    class="search-filter__slider search-filter__slider--to"
-                  />
-                </div>
-                <span class="search-filter__price-display">
-                  {{ form.priceTo ? `${form.priceTo}万円` : '上限なし' }}
-                </span>
-              </div>
+              <label class="search-filter__label">価格</label>
+              <HistogramSlider
+                :buckets="histogram.buckets"
+                :max-value="priceSliderMax"
+                unit="万円"
+                :from="form.priceFrom"
+                :to="form.priceTo"
+                @update:from="form.priceFrom = $event"
+                @update:to="form.priceTo = $event"
+              />
             </div>
           </div>
 
@@ -472,6 +453,7 @@ import {
   NAVI_OPTIONS,
   ENGINE_TYPE_OPTIONS,
 } from '@/constants/searchOptions.js'
+import HistogramSlider from '@/components/Common/HistogramSlider.vue'
 
 const emit = defineEmits(['search'])
 
@@ -560,8 +542,33 @@ const fetchOptions = async () => {
   }
 }
 
+// 価格のヒストグラム
+const props = defineProps({
+  vehicleId: { type: Number, default: null },
+})
+const histogram      = ref({ buckets: [], max_price: 0 })
+const priceSliderMax = ref(2000)
+const fetchHistogram = async () => {
+  try {
+    const params = {}
+    if (props.vehicleId) params.vehicleId = props.vehicleId
+
+    const res = await axios.get('/api/SearchOptions/CarPriceHistogram', { params })
+    if (res.data.success) {
+      histogram.value = res.data.histogram
+      priceSliderMax.value = res.data.price_slider_max
+      form.priceTo = res.data.price_slider_max
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+
+
 onMounted(() => {
   fetchOptions()
+  fetchHistogram()
 })
 const currentYear = new Date().getFullYear()
 const yearOptions = Array.from({ length: 30 }, (_, i) => currentYear - i)

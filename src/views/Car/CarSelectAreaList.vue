@@ -36,7 +36,7 @@
             >
               {{ favorites.includes(car.id) ? '♥' : '♡' }}
             </button>
-            <img v-if="car.mainImageUrl" :src="car.mainImageUrl" :alt="`車両ID:${car.id}`" />
+            <img v-if="car.mainImageUrl" :src="imageBaseUrl + car.mainImageUrl" :alt="`車両ID:${car.id}`" />
             <div v-else class="car-item__no-image">NO IMAGE</div>
           </div>
 
@@ -139,6 +139,7 @@ const sortKey      = ref('')
 const sortOrder    = ref('')
 const searchParams = ref({})
 const favorites    = ref([])
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL
 
 const seriesId  = route.query.seriesId
 const regionIds = route.query.regionIds
@@ -185,6 +186,7 @@ const fetchCarList = async () => {
       }
     })
     carList.value    = res.data.carList
+    console.log(carList.value);
     totalCount.value = res.data.totalCount
   } catch (e) {
     console.error(e)
