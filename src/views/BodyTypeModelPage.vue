@@ -70,7 +70,7 @@
                                 >
                                     <a
                                         :data-id="`main_${item.seriesName}_nn`"
-                                        :href="`/catalog/${item.seriesId}/${item.seriesName.toLowerCase()}/`"
+                                        @click.prevent="goToAreaSelect(item.seriesId)"
                                         class="car-item__image-link"
                                     >
                                         <img
@@ -98,11 +98,11 @@
                                         >
                                             <a
                                                 :data-id="`main_${item.seriesName}_nn`"
-                                                href=""
+                                                @click.prevent="goToAreaSelect(item.seriesId)"
                                                 class="car-item__name"
                                             >
                                                 {{ item.seriesName }}
-                                                <span class="car-item__count">({{ item.manufacturerId }})</span>
+                                                <span class="car-item__count">({{ stockCounts[item.seriesId] ?? 0 }})</span>
                                             </a>
                                         </label>
                                         <a
@@ -124,13 +124,21 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import axios from 'axios'
 import '@/assets/components.css'
 import AppHeader from '@/components/Common/AppHeader.vue'
+import { useRouter, useRoute } from 'vue-router'
 
-const route = useRoute()
+const router = useRouter()
+const route  = useRoute()
 const name  = route.params.Name
+
+const goToAreaSelect = (seriesId) => {
+  router.push({
+    path: '/car/area-select',
+    query: { seriesId },
+  })
+}
 
 const displayName       = ref('')
 const bodyTypeData      = ref([])
@@ -277,6 +285,21 @@ const handleImageError = (event) => {
     event.target.src = NO_IMAGE_URL
 }
 
+const stockCounts = ref({})
+const fetchSeriesStkCount = async (seriesIds) => {
+  try {
+    const { data } = await axios.get('http://laravel11practice.local:81/api/SeriesStkCount', {
+      params: { 'seriesIds[]': seriesIds },
+      headers: { 'Authorization': 'Bearer token', 'Content-Type': 'application/json' },
+    })
+    stockCounts.value = Object.fromEntries(
+      data.data.map(item => [item.seriesId, item.num])
+    )
+  } catch (error) {
+    console.error('API Error:', error)
+  }
+}
+
 const initData = async () => {
     loading.value = true
     try {
@@ -284,6 +307,9 @@ const initData = async () => {
         await fetchCarSeriesByBodyType()
         const manufacturerIds = getUniqueManufacturerIds()
         await fetchManufacturersByIds(manufacturerIds)
+
+        const seriesIds = carSeriesData.value.map(car => car.seriesId)
+        await fetchSeriesStkCount(seriesIds)
     } finally {
         loading.value = false
     }
