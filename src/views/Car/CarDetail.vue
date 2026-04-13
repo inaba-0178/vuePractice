@@ -80,13 +80,34 @@
         <!-- 右：価格・ボタンエリア -->
         <div class="car-detail__price-area">
           <div class="car-detail__price-block">
-            <div class="car-detail__price-label">支払総額</div>
-            <div class="car-detail__price">
-              {{ formatPrice(car.price) }}<span class="car-detail__price-unit">万円</span>
-            </div>
-            <div class="car-detail__price-sub">車体価格 {{ formatPrice(car.price) }}万円</div>
 
-            <!-- ローン情報追加 -->
+            <!-- 支払総額・車両本体価格 横並び -->
+            <div class="car-detail__price-row">
+
+              <!-- 支払総額 -->
+              <div class="car-detail__price-item">
+                <div class="car-detail__price-label">支払総額（税込）</div>
+                <div class="car-detail__price">
+                  {{ formatPrice(car.totalPrice ?? car.price) }}
+                </div>
+                <div class="car-detail__price-misc" v-if="car.miscFees">
+                  （諸費用 {{ formatPrice(car.miscFees) }}含む）
+                </div>
+              </div>
+
+              <div class="car-detail__price-divider"></div>
+
+              <!-- 車両本体価格 -->
+              <div class="car-detail__price-item">
+                <div class="car-detail__price-label">車両本体価格（税込）</div>
+                <div class="car-detail__price car-detail__price--base">
+                  {{ formatPrice(car.priceWithTax ?? car.price) }}
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ローン情報 -->
             <div class="car-detail__loan" v-if="loan">
               <div class="car-detail__loan-header">ローンご利用時</div>
               <div class="car-detail__loan-body">
@@ -464,7 +485,7 @@
             <!-- 左：車両画像 + 車両名 -->
             <div class="car-detail__sticky-left">
               <div class="car-detail__sticky-img">
-                <img v-if="currentImage" :src="currentImage.image_url" alt="車両画像" />
+                <img v-if="currentImage" :src="imageBaseUrl + currentImage.imageUrl" alt="車両画像" />
                 <div v-else class="car-detail__sticky-noimg">NO IMAGE</div>
               </div>
               <div class="car-detail__sticky-car-info">
@@ -475,8 +496,16 @@
 
             <!-- 中央：価格 -->
             <div class="car-detail__sticky-price">
-              <span class="car-detail__sticky-price-label">支払総額</span>
-              <span class="car-detail__sticky-price-val">{{ formatPrice(car?.price) }}万円</span>
+              <span class="car-detail__sticky-price-label">支払総額（税込）</span>
+              <span class="car-detail__sticky-price-val">{{ formatPrice(car?.totalPrice ?? car?.price) }}</span>
+              <span class="car-detail__price-misc" v-if="car.miscFees">
+                （諸費用 {{ formatPrice(car.miscFees) }}含む）
+              </span>
+            </div>
+
+            <div class="car-detail__sticky-price">
+              <span class="car-detail__sticky-price-label">車両本体価格（税込）</span>
+              <span class="car-detail__sticky-price-val">{{ formatPrice(car.priceWithTax ?? car.price) }}</span>
             </div>
 
             <!-- 右：店舗情報 + ボタン -->
@@ -505,10 +534,13 @@
 
 <script setup>
   import { ref, computed, onMounted } from 'vue'
+  import { formatPrice, formatMileage, formatRepairHistory, formatInspection, formatSteering, formatFuelType, formatSlideDoor} from '@/utils/format'
   import { useRoute } from 'vue-router'
   import axios from 'axios'
   import ReservationCalendar from '@/components/Reservation/ReservationCalendar.vue'
   import LoanSimulatorModal from '@/components/Loan/LoanSimulatorModal.vue'
+  import { useMemberAuthStore } from '@/stores/memberAuth'
+  const memberAuthStore = useMemberAuthStore()
 
   const route = useRoute()
   const carId = route.params.id
@@ -534,22 +566,6 @@
 
   const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL
 
-  onMounted(() => {
-    // ...既存のfetchAll()
-
-    window.addEventListener('scroll', () => {
-      const imageArea = document.querySelector('.car-detail__image-area')
-      const dealerSection = document.querySelector('.car-detail__dealer')
-
-      if (!imageArea) return
-
-      const imageBottom  = imageArea.getBoundingClientRect().bottom
-      const dealerTop    = dealerSection?.getBoundingClientRect().top ?? Infinity
-
-      showStickyBar.value = imageBottom < 0 && dealerTop > window.innerHeight
-    })
-  })
-
   // 画像関連
   const imageCategory     = ref('all')
   const currentImageIndex = ref(0)
@@ -558,7 +574,6 @@
     if (imageCategory.value === 'all') return images.value
     return images.value.filter(img => img.image_type === imageCategory.value)
   })
-console.log(filteredImages);
   const currentImage = computed(() => filteredImages.value[currentImageIndex.value] ?? null)
 
   const thumbPage = ref(0)
@@ -629,34 +644,10 @@ console.log(filteredImages);
   const hasEquipment = (value) => options.value.some(o => o.optionName === value && o.isEquipped)
   const hasOption    = (value) => options.value.some(o => o.optionName === value && o.isEquipped)
 
-  const toggleFavorite = () => { isFavorite.value = !isFavorite.value }
-
   const openMap = () => {
     if (!dealer.value?.latitude || !dealer.value?.longitude) return
     window.open(`https://www.google.com/maps?q=${dealer.value.latitude},${dealer.value.longitude}`, '_blank')
   }
-
-  // フォーマット関数
-  const formatPrice         = (price) => Math.floor(Number(price) / 10000)
-  const formatMileage       = (mileage) => mileage ? mileage.toLocaleString() : '-'
-  const formatRepairHistory = (val) => ({ none: 'なし', minor: '軽微あり', major: 'あり', unknown: '不明' }[val] ?? val)
-  const formatInspection    = (status, expireDate) => {
-    if (status === 'none') return '車検なし'
-    if (status === 'new_car') return '新車'
-    if (expireDate) return expireDate
-    return '車検整備付'
-  }
-  const formatSteering  = (val) => ({ right: '右ハンドル', left: '左ハンドル' }[val] ?? val ?? '-')
-
-  const formatFuelType  = (val) => ({
-    gasoline: 'ガソリン', diesel: 'ディーゼル', hybrid: 'ハイブリッド',
-    electric: '電気自動車', phev: 'PHEV', other: 'その他'
-  }[val] ?? val ?? '-')
-
-  const formatSlideDoor = (val) => ({
-    none: 'なし', right_only: '片側（右）', left_power: '片側（左）',
-    both_manual: '両側（手動）', both_power: '両側（電動）'
-  }[val] ?? val ?? '-')
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-'
@@ -680,15 +671,15 @@ console.log(filteredImages);
 
       car.value = {
         ...data.carData,
-        firstRegistrationDate: data.carDetailData?.firstRegistrationDate,
-        inspectionExpireDate:  data.carDetailData?.inspectionExpireDate,
-        inspectionStatus:      data.carDetailData?.inspectionStatus,
-        driveSystem:           data.carDetailData?.driveSystem,
-        displacement:          data.carDetailData?.displacement,
-        steeringWheel:         data.carDetailData?.steeringWheel,
-        numberOfDoors:         data.carDetailData?.numberOfDoors,
-        slideDoor:             data.carDetailData?.slideDoor,
-        ridingCapacity:        data.carDetailData?.ridingCapacity,
+        firstRegistrationDate:  data.carDetailData?.firstRegistrationDate,
+        inspectionExpireDate:   data.carDetailData?.inspectionExpireDate,
+        inspectionStatus:       data.carDetailData?.inspectionStatus,
+        driveSystem:            data.carDetailData?.driveSystem,
+        displacement:           data.carDetailData?.displacement,
+        steeringWheel:          data.carDetailData?.steeringWheel,
+        numberOfDoors:          data.carDetailData?.numberOfDoors,
+        slideDoor:              data.carDetailData?.slideDoor,
+        ridingCapacity:         data.carDetailData?.ridingCapacity,
       }
       images.value  = data.carImages ?? []
       options.value = data.carOptions ?? []
@@ -739,9 +730,43 @@ console.log(filteredImages);
     loanSection.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // お気に入り登録
+  const fetchFavoriteStatus = async () => {
+    if (!memberAuthStore.isLoggedIn) return
+    try {
+      const res = await axios.get('/api/Favorites/isFavorite', {
+        params: { carId: carId }
+      })
+      if (res.data.success) {
+        isFavorite.value = res.data.is_favorite
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const toggleFavorite = async () => {
+    if (!memberAuthStore.isLoggedIn) {
+      isFavorite.value = !isFavorite.value
+      return
+    }
+    try {
+      const res = await axios.patch('/api/Favorites/toggle', null, {
+        params: { carId: carId }
+      })
+      if (res.data.success) {
+        isFavorite.value = res.data.is_favorite
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   onMounted(() => {
+
     fetchAll()
     fetchLoan()
+    fetchFavoriteStatus()
 
     window.addEventListener('scroll', () => {
       const imageArea    = document.querySelector('.car-detail__image-area')
@@ -752,7 +777,6 @@ console.log(filteredImages);
       showStickyBar.value = imageBottom < 0 && dealerTop > window.innerHeight
     })
   })
-
 </script>
 
 <style scoped>
@@ -910,13 +934,12 @@ console.log(filteredImages);
 }
 .car-detail__price {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 400;
   color: #dc5078;
   line-height: 1;
 }
 .car-detail__price-unit { font-size: 16px; margin-left: 2px; }
-.car-detail__price-sub { font-size: 12px; color: #666; margin-top: 6px; }
 
 .car-detail__actions { display: flex; flex-direction: column; gap: 10px; }
 
@@ -1470,5 +1493,41 @@ console.log(filteredImages);
 }
 .car-detail__loan-simulator-btn:hover {
   background: rgba(220, 80, 120, 0.1);
+}
+
+.car-detail__price-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.car-detail__price-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.car-detail__price-divider {
+  width: 1px;
+  background: #2a2a2a;
+  align-self: stretch;
+  margin: 0 20px;
+}
+
+.car-detail__price--base {
+  font-size: 24px;
+  color: #ccc;
+}
+
+.car-detail__price-unit--base {
+  font-size: 13px;
+  color: #ccc;
+}
+
+.car-detail__price-misc {
+  font-size: 11px;
+  color: #666;
 }
 </style>
