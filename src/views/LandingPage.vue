@@ -114,17 +114,25 @@
                 <div class="area-wrap">
                     <div class="area-col">
                         <dl class="area-list" v-for="region in leftRegions" :key="region.name">
-                            <dt class="area-list__region"><a href="">{{ region.name }}</a></dt>
+                            <dt class="area-list__region">
+                                <a @click.prevent="goToRegionCarListByArea(region.prefectures)" style="cursor:pointer">
+                                    {{ region.name }}
+                                </a>
+                            </dt>
                             <dd class="area-list__pref" v-for="pref in region.prefectures" :key="pref.name">
-                                <a href="">{{ pref.name }}</a>
+                                <a @click.prevent="goToRegionCarList(pref.id)" style="cursor:pointer">{{ pref.name }}</a>
                             </dd>
                         </dl>
                     </div>
                     <div class="area-col">
                         <dl class="area-list" v-for="region in rightRegions" :key="region.name">
-                            <dt class="area-list__region"><a href="">{{ region.name }}</a></dt>
+                            <dt class="area-list__region">
+                                <a @click.prevent="goToRegionCarListByArea(region.prefectures)" style="cursor:pointer">
+                                    {{ region.name }}
+                                </a>
+                            </dt>
                             <dd class="area-list__pref" v-for="pref in region.prefectures" :key="pref.name">
-                                <a href="">{{ pref.name }}</a>
+                                <a @click.prevent="goToRegionCarList(pref.id)" style="cursor:pointer">{{ pref.name }}</a>
                             </dd>
                         </dl>
                     </div>
@@ -202,15 +210,33 @@
                 name: area.name.replace('地方', ''),
                 url: "",
                 prefectures: area.regions.map(region => ({
-                    name: region.name,
-                    url: region.query_param ? `/prefecture/${region.query_param}` : ""
+                    name:   region.name,
+                    id:     region.id,
+                    url:    region.query_param ? `/prefecture/${region.query_param}` : ""
                 }))
             }))
+            console.log(regions.value)
         } catch (error) {
             console.error('API Error:', error)
         } finally {
             loading.value = false
         }
+    }
+
+    const goToRegionCarList = (regionId) => {
+        router.push({
+            path: '/car/select-region-list',
+            query: { regionId }
+        })
+    }
+
+    // 地方クリック → 複数regionIds
+    const goToRegionCarListByArea = (prefectures) => {
+        const regionIds = prefectures.map(p => p.id).join(',')
+        router.push({
+            path: '/car/select-region-list',
+            query: { regionIds }
+        })
     }
 
     const leftRegions  = computed(() => regions.value.slice(0, 5))
