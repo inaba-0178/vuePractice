@@ -226,7 +226,7 @@
     const goToRegionCarList = (regionId) => {
         router.push({
             path: '/car/select-region-list',
-            query: { regionId }
+            query: { regionIds: regionId }
         })
     }
 

@@ -20,88 +20,15 @@
         :activeOrder="sortOrder"
       />
 
-      <div class="car-list">
-        <div
-          v-for="car in carList"
-          :key="car.id"
-          class="car-item"
-          @click="goToDetail(car.id)"
-        >
-          <div class="car-item__image">
-            <span v-if="car.isNew" class="car-item__tag-new">新着</span>
-            <button
-              class="car-item__fav"
-              :class="{ 'is-active': favorites.includes(car.id) }"
-              @click.stop="toggleFavorite(car.id)"
-            >
-              {{ favorites.includes(car.id) ? '♥' : '♡' }}
-            </button>
-            <img v-if="car.mainImageUrl" :src="imageBaseUrl + car.mainImageUrl" :alt="`車両ID:${car.id}`" />
-            <div v-else class="car-item__no-image">NO IMAGE</div>
-          </div>
-
-          <div class="car-item__body">
-            <div class="car-item__price-row">
-              <div>
-                <span class="car-item__price">{{ formatPrice(car.price) }}</span>
-                <span class="car-item__price-unit">万円</span>
-                <span class="car-item__price-label">（支払総額）</span>
-              </div>
-              <div class="car-item__price-sub">車体 {{ formatPrice(car.price) }}万円</div>
-            </div>
-
-            <div class="car-item__specs">
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">年式</span>
-                <span class="car-item__spec-value">{{ car.modelYear ? `${car.modelYear}年` : '-' }}</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">走行距離</span>
-                <span class="car-item__spec-value">{{ formatMileage(car.mileage) }}km</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">修復歴</span>
-                <span class="car-item__spec-value">{{ formatRepairHistory(car.repairHistory) }}</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">車検</span>
-                <span class="car-item__spec-value">{{ formatInspection(car.inspectionStatus, car.inspectionExpireDate) }}</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">ミッション</span>
-                <span class="car-item__spec-value">{{ car.transmission || '-' }}</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">排気量</span>
-                <span class="car-item__spec-value">{{ car.displacement ? `${car.displacement}cc` : '-' }}</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">ボディタイプ</span>
-                <span class="car-item__spec-value">{{ car.bodyTypeName || '-' }}</span>
-              </div>
-              <div class="car-item__spec">
-                <span class="car-item__spec-label">色</span>
-                <span class="car-item__spec-value">{{ car.color || '-' }}</span>
-              </div>
-            </div>
-
-            <div class="car-item__bottom">
-              <div class="car-item__dealer">
-                <span class="car-item__dealer-name">{{ car.dealerName }}</span>
-                <div class="car-item__dealer-meta">
-                  <span class="car-item__dealer-region">{{ car.dealerCity }}</span>
-                  <div v-if="car.dealerRating" class="car-item__rating">
-                    <span class="car-item__rating-star">★</span>
-                    <span class="car-item__rating-val">{{ car.dealerRating }}</span>
-                    <span class="car-item__rating-count">（{{ car.dealerReviewCount }}件）</span>
-                  </div>
-                </div>
-              </div>
-              <button class="car-item__btn-inquiry" @click.stop>在庫確認・見積依頼</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CarCard
+        v-for="car in carList"
+        :key="car.id"
+        :car="car"
+        :is-favorite="favorites.includes(car.id)"
+        :show-favorite-btn="true"
+        @click="goToDetail"
+        @toggle-favorite="toggleFavorite"
+      />
 
       <div v-if="totalPages > 1" class="pagination">
         <button @click="goToPage(1)" :disabled="currentPage === 1" class="pagination__btn">最初</button>
@@ -126,6 +53,7 @@ import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import CarSearchFilter from '@/components/Common/CarSearchFilter.vue'
 import CarSortBar from '@/components/Common/CarSortBar.vue'
+import CarCard from '@/components/Common/CarCard.vue'
 
 const router = useRouter()
 const route  = useRoute()
@@ -139,7 +67,6 @@ const sortKey      = ref('')
 const sortOrder    = ref('')
 const searchParams = ref({})
 const favorites    = ref([])
-const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL
 const regionIds    = route.query.regionIds
 
 const totalPages = computed(() => Math.ceil(totalCount.value / limit))
@@ -198,16 +125,6 @@ const toggleFavorite = (id) => {
 const onSearch = (params) => { searchParams.value = params; currentPage.value = 1; fetchCarList() }
 const onSort   = ({ key, order }) => { sortKey.value = key; sortOrder.value = order; currentPage.value = 1; fetchCarList() }
 
-const formatPrice         = (price) => Math.floor(Number(price) / 10000)
-const formatMileage       = (mileage) => mileage ? mileage.toLocaleString() : '-'
-const formatRepairHistory = (val) => ({ none: 'なし', minor: '軽微あり', major: 'あり', unknown: '不明' }[val] ?? val)
-const formatInspection    = (status, expireDate) => {
-  if (status === 'none') return '車検なし'
-  if (status === 'new_car') return '新車'
-  if (expireDate) return expireDate
-  return '車検整備付'
-}
-
 watch(currentPage, () => fetchCarList())
 onMounted(() => fetchCarList())
 </script>
@@ -257,227 +174,6 @@ onMounted(() => fetchCarList())
   font-weight: 300;
   color: #666;
   letter-spacing: 0.05em;
-}
-
-.car-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 48px;
-}
-
-.car-item {
-  display: flex;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-}
-.car-item:hover {
-  border-color: #444;
-}
-
-.car-item__image {
-  width: 220px;
-  min-width: 220px;
-  background: #222;
-  display: flex;
-  align-items:center;
-  justify-content: center;
-  border-right: 1px solid #2a2a2a;
-  position: relative;
-}
-.car-item__image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.car-item__no-image {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  font-weight: 300;
-  color: #444;
-  letter-spacing: 0.1em;
-}
-
-.car-item__tag-new {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(220, 80, 120, 0.15);
-  color: #dc5078;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 3px;
-  border: 1px solid rgba(220, 80, 120, 0.3);
-}
-
-.car-item__fav {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 28px;
-  height: 28px;
-  border: 1px solid #333;
-  border-radius: 50%;
-  background: #0d0d0d;
-  color: #888;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.car-item__fav.is-active {
-  background: rgba(220, 80, 120, 0.15);
-  border-color: #dc5078;
-  color: #dc5078;
-}
-.car-item__fav:hover {
-  border-color: #dc5078;
-  color: #dc5078;
-}
-
-.car-item__body {
-  flex: 1;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-.car-item__price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.car-item__price {
-  font-family: 'Cormorant Garamond',serif;
-  font-size: 32px;
-  font-weight: 400;
-  color: #dc5078;
-  letter-spacing: 0.05em;
-  line-height: 1;
-}
-.car-item__price-unit {
-  font-family: 'Cormorant Garamond',serif;
-  font-size: 14px;
-  color: #dc5078;
-  margin-left: 2px;
-}
-.car-item__price-label {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  color: #666;
-  margin-left: 4px;
-}
-.car-item__price-sub {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  color: #666;
-}
-
-.car-item__specs {
-  display: grid;
-  grid-template-columns: repeat(4, 160px);  /* ← 固定幅 */
-  gap: 8px 16px;
-  border-top: 1px solid #1a1a1a;
-  border-bottom: 1px solid #1a1a1a;
-  padding: 10px 0;
-}
-.car-item__spec {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.car-item__spec-label {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  font-weight: 400;
-  color: #888;
-  letter-spacing: 0.08em;
-}
-.car-item__spec-value {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: #ccc;
-  letter-spacing: 0.03em;
-}
-
-.car-item__bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.car-item__dealer {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.car-item__dealer-name {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: #ccc;
-}
-.car-item__dealer-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.car-item__dealer-region {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  color: #666;
-}
-.car-item__rating {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.car-item__rating-star {
-  font-size: 12px;
-  color: #f59e0b;
-}
-.car-item__rating-val {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: #ccc;
-}
-.car-item__rating-count {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  color: #666;
-}
-
-.car-item__btn-inquiry {
-  padding: 8px 16px;
-  border-radius: 3px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid #dc5078;
-  background: #dc5078;
-  color: #fff;
-  white-space: nowrap;
-  flex-shrink: 0;
-  letter-spacing: 0.05em;
-  transition: background 0.15s;
-}
-.car-item__btn-inquiry:hover {
-  background: #c44068;
 }
 
 .pagination {
