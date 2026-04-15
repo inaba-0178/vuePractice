@@ -20,6 +20,8 @@ import CarSelectAreaList from '@/views/Car/CarSelectAreaList.vue'
 import CarDetail from '@/views/Car/CarDetail.vue'
 import SelectRegionCarList from '@/views/Car/SelectRegionCarList.vue'
 import MypageFavorites from '@/views/Mypage/MypageFavorites.vue'
+import SelectConditionCarList from '@/views/Car/SelectConditionCarList.vue'
+import DealerDetail from '@/views/Dealer/DealerDetail.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -122,6 +124,16 @@ const routes = [
     path: '/car/select-region-list',
     name: 'car-select-region-list',
     component: SelectRegionCarList
+  },
+  {
+    path: '/car/select-condition-list',
+    name: 'car-select-condition-list',
+    component: SelectConditionCarList
+  },
+  {
+    path: '/dealer/:id',
+    name: 'DealerDetail',
+    component: DealerDetail
   }
 ]
 
