@@ -150,7 +150,9 @@
                         <dl>
                             <dt class="choosy-item__title">価格から探す</dt>
                             <dd class="choosy-item__value" v-for="price in priceList" :key="price.name">
-                                <a href="">{{ price.name }}</a>
+                                <a @click.prevent="goToPriceList(price)" style="cursor:pointer">
+                                    {{ price.name }}
+                                </a>
                             </dd>
                         </dl>
                     </div>
@@ -158,7 +160,9 @@
                         <dl>
                             <dt class="choosy-item__title">走行距離から探す</dt>
                             <dd class="choosy-item__value" v-for="mileage in mileageList" :key="mileage.name">
-                                <a href="">{{ mileage.name }}</a>
+                                <a @click.prevent="goToMileageList(mileage)" style="cursor:pointer">
+                                    {{ mileage.name }}
+                                </a>
                             </dd>
                         </dl>
                     </div>
@@ -166,7 +170,9 @@
                         <dl>
                             <dt class="choosy-item__title">乗車定員から探す</dt>
                             <dd class="choosy-item__value" v-for="ridingCapacity in ridingCapacityList" :key="ridingCapacity.name">
-                                <a href="">{{ ridingCapacity.name }}</a>
+                                <a @click.prevent="goToPassengerList(ridingCapacity)" style="cursor:pointer">
+                                    {{ ridingCapacity.name }}
+                                </a>
                             </dd>
                         </dl>
                     </div>
@@ -174,7 +180,9 @@
                         <dl>
                             <dt class="choosy-item__title">排気量から探す</dt>
                             <dd class="choosy-item__value" v-for="displacement in displacementList" :key="displacement.name">
-                                <a href="">{{ displacement.name }}</a>
+                                <a @click.prevent="goToDisplacementList(displacement)" style="cursor:pointer">
+                                    {{ displacement.name }}
+                                </a>
                             </dd>
                         </dl>
                     </div>
@@ -263,6 +271,16 @@
     const priceList = computed(() => priceLists.value)
     fetchPriceLists()
 
+    const goToPriceList = (price) => {
+    const query = price.is_unlimited
+            ? { priceFrom: price.max_amount }
+            : { priceTo: price.max_amount }
+        router.push({
+            path: '/car/select-condition-list',
+            query
+        })
+    }
+
     const mileageLists       = ref([])
     const mileageListLoading = ref(false)
     const fetchmileageLists = async () => {
@@ -271,6 +289,7 @@
             const { data } = await axios.get('http://laravel11practice.local:81/api/Mileages')
             mileageLists.value = data.data.MileageList.map(MileageList => ({
                 name:         MileageList.name,
+                min_amount:   MileageList.min_amount,
                 max_amount:   MileageList.max_amount,
                 is_unlimited: MileageList.is_unlimited,
             }))
@@ -279,6 +298,16 @@
         } finally {
             loading.value = false
         }
+    }
+
+    const goToMileageList = (mileage) => {
+        const query = {}
+        if (mileage.min_amount) query.mileageFrom = mileage.min_amount
+        if (mileage.max_amount) query.mileageTo   = mileage.max_amount
+        router.push({
+            path: '/car/select-condition-list',
+            query
+        })
     }
     const mileageList = computed(() => mileageLists.value)
     fetchmileageLists()
@@ -291,6 +320,7 @@
             const { data } = await axios.get('http://laravel11practice.local:81/api/Displacements')
             displacementLists.value = data.data.DisplacementList.map(DisplacementList => ({
                 name:         DisplacementList.name,
+                min_amount:   DisplacementList.min_amount,
                 max_amount:   DisplacementList.max_amount,
                 is_unlimited: DisplacementList.is_unlimited,
             }))
@@ -299,6 +329,16 @@
         } finally {
             loading.value = false
         }
+    }
+
+    const goToDisplacementList = (displacement) => {
+        const query = {}
+        if (displacement.min_amount) query.engineFrom = displacement.min_amount
+        if (displacement.max_amount) query.engineTo   = displacement.max_amount
+        router.push({
+            path: '/car/select-condition-list',
+            query
+        })
     }
     const displacementList = computed(() => displacementLists.value)
     fetchdisplacementLists()
@@ -319,6 +359,12 @@
         } finally {
             loading.value = false
         }
+    }
+    const goToPassengerList = (ridingCapacity) => {
+        router.push({
+            path: '/car/select-condition-list',
+            query: { passengerCount: ridingCapacity.max_amount }
+        })
     }
     const ridingCapacityList = computed(() => ridingCapacityLists.value)
     fetchRidingCapacityLists()
