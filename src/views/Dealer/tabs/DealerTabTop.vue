@@ -24,15 +24,15 @@
                         <tr>
                             <th>ホームページ</th>
                             <td>
-                                <a :href="dealer.website_url" target="_blank" class="dealer-info__link" v-if="dealer.website_url">
-                                    {{ dealer.website_url }}
+                                <a :href="dealer.website_url" target="_blank" class="dealer-info__link" v-if="dealer.websiteUrl">
+                                    {{ dealer.websiteUrl }}
                                 </a>
                                 <span v-else>-</span>
                             </td>
                         </tr>
                         <tr>
                             <th>営業時間</th>
-                            <td>{{ dealer.business_hours_from }}〜{{ dealer.business_hours_to }}</td>
+                            <td>{{ dealer.businessHoursFrom }}〜{{ dealer.businessHoursTo }}</td>
                         </tr>
                         <tr>
                             <th>定休日</th>
@@ -48,7 +48,7 @@
         </section>
 
         <!-- インフォメーション -->
-        <section class="tab-section" v-if="dealer.free_text">
+        <section class="tab-section" v-if="dealer.freeText">
             <div class="section-header">
                 <p class="section-label">INFORMATION</p>
                 <h2 class="section-title">お店からのインフォメーション</h2>

@@ -27,7 +27,7 @@
                         :key="tab.key"
                         class="dealer-tab__item"
                         :class="{ 'dealer-tab__item--active': activeTab === tab.key }"
-                        @click="activeTab = tab.key"
+                        @click="changeTab(tab.key)"
                     >
                         {{ tab.label }}
                     </li>
@@ -75,8 +75,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import AppHeader         from '@/components/Common/AppHeader.vue'
 import DealerTabTop      from '@/views/Dealer/tabs/DealerTabTop.vue'
@@ -90,9 +90,10 @@ import DealerTabReview   from '@/views/Dealer/tabs/DealerTabReview.vue'
 import DealerTabRelated  from '@/views/Dealer/tabs/DealerTabRelated.vue'
 
 const route    = useRoute()
+const router   = useRouter()
 const dealerId = Number(route.params.id)
 
-const activeTab = ref('top')
+const activeTab = ref(route.query.tab || 'top')
 const loading   = ref(false)
 const dealer    = ref(null)
 const images    = ref([])
@@ -142,6 +143,14 @@ const regularHolidayLabel = computed(() => {
     const suffix = dealer.value.regularHolidayExceptHoliday ? '（祝日除く）' : ''
     return dealer.value.regularHolidayDays + suffix
 })
+
+// タブ切り替え時にURLを更新
+const changeTab = (key) => {
+    activeTab.value = key
+    router.replace({
+        query: { ...route.query, tab: key }
+    })
+}
 
 onMounted(() => {
     fetchDealerInfo()
