@@ -53,6 +53,7 @@
                 />
                 <DealerTabStaff
                     v-else-if="activeTab === 'staff'"
+                    :dealerId="dealerId"
                 />
                 <DealerTabService
                     v-else-if="activeTab === 'service'"
