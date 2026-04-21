@@ -2,44 +2,42 @@
     <div>
         <section class="tab-section">
             <div class="section-header">
-                <p class="section-label">COMING SOON</p>
-                <h2 class="section-title">{{ title }}</h2>
+                <p class="section-label">SERVICE</p>
+                <h2 class="section-title">各種サービス</h2>
             </div>
-            <div class="placeholder">
-                <p>準備中です</p>
-            </div>
+            <div v-if="loading" class="loading">読み込み中...</div>
+            <DealerContentCard v-else :contents="contents" />
         </section>
     </div>
 </template>
 
 <script setup>
-// タイトルだけ各ファイルで変更してください
-// DealerTabStaff.vue   → 'スタッフ紹介'
-// DealerTabService.vue → '各種サービス'
-// DealerTabEvent.vue   → 'フェア＆イベント'
-// DealerTabWarranty.vue→ '保証'
-// DealerTabReview.vue  → 'お店のクチコミ'
-// DealerTabRelated.vue → '系列店の一覧'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import DealerContentCard from '@/components/Dealer/DealerContentCard.vue'
 
-const title = 'スタッフ紹介'
+const props   = defineProps({ dealerId: { type: Number, required: true } })
+const contents = ref([])
+const loading  = ref(false)
+
+const fetchContents = async () => {
+    loading.value = true
+    try {
+        const { data } = await axios.get('/api/SelectDealerContentData', {
+            params: { dealerId: props.dealerId }
+        })
+        contents.value = data.contents.filter(c => c.category === 'service')
+    } catch (e) {
+        console.error(e)
+    } finally {
+        loading.value = false
+    }
+}
+
+onMounted(() => fetchContents())
 </script>
 
 <style scoped>
-.tab-section {
-    padding: 64px 40px;
-}
-
-.placeholder {
-    border: 1px solid #222;
-    border-radius: 4px;
-    padding: 64px;
-    text-align: center;
-}
-
-.placeholder p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    color: #666;
-    margin: 0;
-}
+.tab-section { padding: 64px 40px; }
+.loading { font-family: 'Montserrat', sans-serif; font-size: 13px; color: #666; }
 </style>
