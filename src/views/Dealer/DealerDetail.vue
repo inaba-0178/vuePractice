@@ -113,7 +113,7 @@ const tabs = [
     { key: 'event',    label: 'フェア＆イベント' },
     { key: 'warranty', label: '保証' },
     { key: 'review',   label: 'お店のクチコミ' },
-    { key: 'related',  label: '系列店の一覧' },
+    { key: 'related',  label: '系列店・提携店一覧' },
 ]
 
 const fetchDealerInfo = async () => {
