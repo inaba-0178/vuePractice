@@ -73,6 +73,7 @@
                 />
                 <DealerTabRelated
                     v-else-if="activeTab === 'related'"
+                    :dealerId="dealerId"
                 />
             </div>
         </main>

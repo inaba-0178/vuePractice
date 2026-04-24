@@ -173,7 +173,7 @@
                             </div>
                         </template>
 
-                        <p v-if="formError" class="review__form-error">{{ formError }}</p>
+                        <p v-if="formError" class="review__form-error" style="white-space: pre-line;">{{ formError }}</p>
 
                         <div class="review__form-actions">
                             <button class="review__form-cancel" @click="showForm = false">キャンセル</button>
@@ -273,6 +273,7 @@ const fetchReviews = async () => {
         })
         reviews.value    = data.reviews
         totalCount.value = data.totalCount
+        console.log(reviews.value[0])
     } catch (e) {
         console.error(e)
     } finally {
@@ -281,14 +282,28 @@ const fetchReviews = async () => {
 }
 
 const validateForm = () => {
-    if (!form.value.nickname) return 'ニックネームを入力してください'
+    if (!form.value.nickname.trim()) return 'ニックネームを入力してください'
+    if (form.value.nickname.length > 20) return 'ニックネームは20文字以内で入力してください'
     if (!form.value.rating) return '総合評価を選択してください'
-    if (!form.value.comment) return 'クチコミ本文を入力してください'
-    if (!isLoggedIn.value) {
-        if (!form.value.guest_name) return '氏名を入力してください'
-        if (!form.value.guest_phone) return '電話番号を入力してください'
-        if (!form.value.guest_email) return 'メールアドレスを入力してください'
+    if (!form.value.comment.trim()) return 'クチコミ本文を入力してください'
+    if (form.value.comment.length > 2000) return 'クチコミ本文は2000文字以内で入力してください'
+
+    if (form.value.purchased_at && !/^\d{4}\/(0[1-9]|1[0-2])$/.test(form.value.purchased_at)) {
+        return '購入年月はYYYY/MM形式で入力してください。例：2026/04'
     }
+
+    if (!isLoggedIn.value) {
+        if (!form.value.guest_name.trim()) return '氏名を入力してください'
+        if (!form.value.guest_phone.trim()) return '電話番号を入力してください'
+        if (!/^\d{10,11}$/.test(form.value.guest_phone.replace(/-/g, ''))) {
+            return '電話番号は10〜11桁の数字で入力してください'
+        }
+        if (!form.value.guest_email.trim()) return 'メールアドレスを入力してください'
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.guest_email)) {
+            return 'メールアドレスの形式が正しくありません'
+        }
+    }
+
     return ''
 }
 
@@ -324,8 +339,20 @@ const submitReview = async () => {
         }
 
         await fetchReviews()
+
     } catch (e) {
-        formError.value = '投稿に失敗しました。もう一度お試しください。'
+        // APIエラーメッセージを表示
+        if (e.response?.data?.message) {
+            const message = e.response.data.message
+            if (typeof message === 'object') {
+                // バリデーションエラーの場合は配列で返ってくる
+                formError.value = Object.values(message).flat().join('\n')
+            } else {
+                formError.value = message
+            }
+        } else {
+            formError.value = '投稿に失敗しました。もう一度お試しください。'
+        }
     } finally {
         submitting.value = false
     }
