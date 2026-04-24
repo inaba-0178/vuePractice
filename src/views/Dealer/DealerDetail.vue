@@ -57,18 +57,23 @@
                 />
                 <DealerTabService
                     v-else-if="activeTab === 'service'"
+                    :dealerId="dealerId"
                 />
                 <DealerTabEvent
                     v-else-if="activeTab === 'event'"
+                    :dealerId="dealerId"
                 />
                 <DealerTabWarranty
                     v-else-if="activeTab === 'warranty'"
+                    :dealerId="dealerId"
                 />
                 <DealerTabReview
                     v-else-if="activeTab === 'review'"
+                    :dealerId="dealerId"
                 />
                 <DealerTabRelated
                     v-else-if="activeTab === 'related'"
+                    :dealerId="dealerId"
                 />
             </div>
         </main>
