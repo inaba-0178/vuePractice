@@ -39,19 +39,26 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useMemberAuthStore } from '@/stores/memberAuth'
 import axios from 'axios'
 
-const router = useRouter()
+const memberAuth = useMemberAuthStore()
+const router     = useRouter()
 
 async function handleLogout() {
-  try {
-    await axios.post('/api/MemberAuth/logout')
-  } finally {
-    localStorage.removeItem('member_token')
-    delete axios.defaults.headers.common['Authorization']
+    await memberAuth.logout()
     router.push('/member-login')
-  }
 }
+
+// async function handleLogout() {
+//   try {
+//     await axios.post('/api/MemberAuth/logout')
+//   } finally {
+//     localStorage.removeItem('member_token')
+//     delete axios.defaults.headers.common['Authorization']
+//     router.push('/member-login')
+//   }
+// }
 </script>
 
 <style scoped>

@@ -52,6 +52,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useMemberAuthStore } from '@/stores/memberAuth'
 import axios from 'axios'
 
 const router       = useRouter()
@@ -61,26 +62,41 @@ const error        = ref('')
 const loading      = ref(false)
 const showPassword = ref(false)
 
+const memberAuth = useMemberAuthStore()
+
 async function handleLogin() {
-  error.value   = ''
-  loading.value = true
-
-  try {
-    const res = await axios.post('/api/MemberAuth/login', {
-        email:    email.value,
-        password: password.value,
-    })
-
-    localStorage.setItem('member_token', res.data.token)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-    router.push('/mypage')
-
-  } catch (e) {
-    error.value = e.response?.data?.message ?? 'メールアドレスまたはパスワードが違います'
-  } finally {
-    loading.value = false
-  }
+    error.value   = ''
+    loading.value = true
+    try {
+        await memberAuth.login(email.value, password.value)
+        router.push('/mypage')
+    } catch (e) {
+        error.value = e.response?.data?.message ?? 'メールアドレスまたはパスワードが違います'
+    } finally {
+        loading.value = false
+    }
 }
+
+// async function handleLogin() {
+//   error.value   = ''
+//   loading.value = true
+
+//   try {
+//     const res = await axios.post('/api/MemberAuth/login', {
+//         email:    email.value,
+//         password: password.value,
+//     })
+
+//     localStorage.setItem('member_token', res.data.token)
+//     axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+//     router.push('/mypage')
+
+//   } catch (e) {
+//     error.value = e.response?.data?.message ?? 'メールアドレスまたはパスワードが違います'
+//   } finally {
+//     loading.value = false
+//   }
+// }
 </script>
 
 <style scoped>
