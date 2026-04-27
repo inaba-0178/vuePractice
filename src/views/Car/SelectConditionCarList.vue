@@ -1,6 +1,6 @@
 <template>
   <div class="car-list-wrapper">
-    <AppHeader />
+
     <div class="car-list-header">
       <h1 class="car-list-title">車両一覧</h1>
       <p class="car-list-description">{{ pageDescription }}</p>
@@ -52,7 +52,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
-import AppHeader from '@/components/Common/AppHeader.vue'
 import CarSearchFilter from '@/components/Common/CarSearchFilter.vue'
 import CarSortBar from '@/components/Common/CarSortBar.vue'
 import CarCard from '@/components/Common/CarCard.vue'

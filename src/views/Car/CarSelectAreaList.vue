@@ -1,6 +1,5 @@
 <template>
   <div class="car-list-wrapper">
-    <AppHeader />
 
     <div class="car-list-header">
       <h1 class="car-list-title">車両一覧</h1>
@@ -57,7 +56,6 @@ import CarSearchFilter from '@/components/Common/CarSearchFilter.vue'
 import CarSortBar from '@/components/Common/CarSortBar.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useMemberAuthStore } from '@/stores/memberAuth'
-import AppHeader from '@/components/Common/AppHeader.vue'
 import CarCard from '@/components/Common/CarCard.vue'
 
 const authStore = useAuthStore()

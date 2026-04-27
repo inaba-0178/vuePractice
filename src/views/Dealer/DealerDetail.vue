@@ -1,6 +1,5 @@
 <template>
     <div class="dealer-wrapper">
-        <AppHeader />
 
         <main v-if="loading">
             <div class="dealer-loading">
@@ -78,7 +77,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
-import AppHeader         from '@/components/Common/AppHeader.vue'
 import DealerTabTop      from '@/views/Dealer/tabs/DealerTabTop.vue'
 import DealerTabAccess   from '@/views/Dealer/tabs/DealerTabAccess.vue'
 import DealerTabCars     from '@/views/Dealer/tabs/DealerTabCars.vue'
