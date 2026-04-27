@@ -1,6 +1,5 @@
 <template>
     <div class="maker-wrapper">
-        <AppHeader />
 
         <main>
             <section class="hero">
@@ -115,7 +114,6 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import '@/assets/components.css'
-import AppHeader from '@/components/Common/AppHeader.vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 

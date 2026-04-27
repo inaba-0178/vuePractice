@@ -1,6 +1,5 @@
 <template>
     <div class="bodytype-wrapper">
-        <AppHeader />
 
         <main>
             <!-- ローディング -->
@@ -126,7 +125,6 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import '@/assets/components.css'
-import AppHeader from '@/components/Common/AppHeader.vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()

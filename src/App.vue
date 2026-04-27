@@ -1,17 +1,19 @@
 <script setup>
-import LandingPage from './views/LandingPage.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import AppHeader from '@/components/Common/AppHeader.vue'
+import { HIDE_HEADER_ROUTES } from '@/constants/hideHeaderRoutes'
 
-import './assets/LandingPage.css' 
+const route      = useRoute()
+const showHeader = computed(() => !HIDE_HEADER_ROUTES.includes(route.name))
 </script>
 
 <template>
-  <div>
-    <RouterView />
-  </div>
+    <div>
+        <AppHeader v-if="showHeader" />
+        <RouterView />
+    </div>
 </template>
-
-<script setup></script>
 
 <style scoped>
 h1 {
@@ -45,22 +47,6 @@ body {
   color: #222;
   margin: 0;
   padding: 0;
-}
-
-.header-nav {
-  display: flex;
-  justify-content: center;
-  background-color: #fff;
-  padding: 20px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.header-nav a {
-  margin: 0 40px;
-  font-weight: bold;
-  font-size: 1.3rem;
-  text-decoration: none;
-  color: #000;
 }
 
 .hero {

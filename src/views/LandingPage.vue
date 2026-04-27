@@ -1,6 +1,5 @@
 <template>
     <div class="landing-wrapper">
-        <AppHeader />
 
         <main>
             <!-- ヒーロー -->
@@ -197,8 +196,6 @@
     import axios from 'axios'
     
     import { useRouter } from 'vue-router'
-    import AppHeader from '@/components/Common/AppHeader.vue'
-
     
     const router = useRouter()
 

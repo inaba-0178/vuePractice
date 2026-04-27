@@ -22,6 +22,7 @@ import SelectRegionCarList from '@/views/Car/SelectRegionCarList.vue'
 import MypageFavorites from '@/views/Mypage/MypageFavorites.vue'
 import SelectConditionCarList from '@/views/Car/SelectConditionCarList.vue'
 import DealerDetail from '@/views/Dealer/DealerDetail.vue'
+import DealerList from '@/views/Dealer/DealerList.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -134,6 +135,11 @@ const routes = [
     path: '/dealer/:id',
     name: 'DealerDetail',
     component: DealerDetail
+  },
+  {
+    path: '/dealers',
+    name: 'DealerList',
+    component: DealerList,
   }
 ]
 
