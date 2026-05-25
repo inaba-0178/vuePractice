@@ -40,6 +40,7 @@
                   <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}年</option>
                 </select>
               </div>
+              <p v-if="yearError" class="search-filter__error">{{ yearError }}</p>
             </div>
             <div class="search-filter__field">
               <label class="search-filter__label">ミッション</label>
@@ -80,15 +81,20 @@
               <label class="search-filter__label">走行距離</label>
               <div class="search-filter__range">
                 <select v-model="form.mileageFrom" class="search-filter__select">
-                  <option value="">下限なし</option>
-                  <option v-for="m in mileageOptions" :key="m.value" :value="m.value">{{ m.label }}</option>
+                    <option value="">下限なし</option>
+                    <option v-for="m in MIN_MILEAGE_OPTIONS" :key="m.value" :value="m.value">
+                        {{ m.label }}
+                    </option>
                 </select>
                 <span class="search-filter__range-sep">〜</span>
                 <select v-model="form.mileageTo" class="search-filter__select">
-                  <option value="">上限なし</option>
-                  <option v-for="m in mileageOptions" :key="m.value" :value="m.value">{{ m.label }}</option>
+                    <option value="">上限なし</option>
+                    <option v-for="m in MAX_MILEAGE_OPTIONS" :key="m.value" :value="m.value">
+                        {{ m.label }}
+                    </option>
                 </select>
               </div>
+              <p v-if="mileageError" class="search-filter__error">{{ mileageError }}</p>
             </div>
             <div class="search-filter__field"></div>
           </div>
@@ -226,14 +232,19 @@
               <div class="search-filter__range">
                 <select v-model="form.engineFrom" class="search-filter__select">
                   <option value="">下限なし</option>
-                  <option v-for="e in engineOptions" :key="e.value" :value="e.value">{{ e.label }}</option>
+                  <option v-for="e in MIN_ENGINE_OPTIONS" :key="e.value" :value="e.value">
+                    {{ e.label }}
+                  </option>
                 </select>
                 <span class="search-filter__range-sep">〜</span>
                 <select v-model="form.engineTo" class="search-filter__select">
                   <option value="">上限なし</option>
-                  <option v-for="e in engineOptions" :key="e.value" :value="e.value">{{ e.label }}</option>
+                  <option v-for="e in MAX_ENGINE_OPTIONS" :key="e.value" :value="e.value">
+                    {{ e.label }}
+                  </option>
                 </select>
               </div>
+              <p v-if="engineError" class="search-filter__error">{{ engineError }}</p>
             </div>
             <div class="search-filter__field">
               <label class="search-filter__label">車検残</label>
@@ -371,7 +382,7 @@
               </div>
             </div>
             <div class="search-filter__detail-section">
-              <div class="search-filter__detail-section-title" style="color: #dc5078;">ドレスアップ（カスタム）</div>
+              <div class="search-filter__detail-section-title">ドレスアップ（カスタム）</div>
               <div class="search-filter__checkboxes search-filter__checkboxes--col2">
                 <label v-for="eq in equipmentDressup" :key="eq.value" class="search-filter__checkbox-label">
                   <input type="checkbox" v-model="form.equipment" :value="eq.value" class="search-filter__checkbox" />
@@ -444,14 +455,18 @@
 import { ref, reactive, onMounted } from 'vue'
 import axios from 'axios'
 import {
-  HANDLE_OPTIONS,
-  DOOR_COUNT_OPTIONS,
-  SLIDE_DOOR_OPTIONS,
-  DRIVE_OPTIONS,
-  INSPECTION_OPTIONS,
-  AUDIO_OPTIONS,
-  NAVI_OPTIONS,
-  ENGINE_TYPE_OPTIONS,
+    HANDLE_OPTIONS,
+    DOOR_COUNT_OPTIONS,
+    SLIDE_DOOR_OPTIONS,
+    DRIVE_OPTIONS,
+    INSPECTION_OPTIONS,
+    AUDIO_OPTIONS,
+    NAVI_OPTIONS,
+    ENGINE_TYPE_OPTIONS,
+    MIN_MILEAGE_OPTIONS,
+    MAX_MILEAGE_OPTIONS,
+    MIN_ENGINE_OPTIONS,
+    MAX_ENGINE_OPTIONS,
 } from '@/constants/searchOptions.js'
 import HistogramSlider from '@/components/Common/HistogramSlider.vue'
 
@@ -469,7 +484,6 @@ const equipmentSafety       = ref([])
 const equipmentEnv          = ref([])
 const equipmentDressup      = ref([])
 const seatOptions           = ref([])
-const mileageOptions        = ref([])
 const engineOptions         = ref([])
 const loanMonthlyOptions    = ref([])
 const loanDownOptions       = ref([])
@@ -503,8 +517,7 @@ const fetchOptions = async () => {
       axios.get('/api/SearchOptions/EquipmentEnv'),
       axios.get('/api/SearchOptions/EquipmentDressup'),
       axios.get('/api/SearchOptions/SeatOption'),
-      axios.get('/api/Mileages'),
-      axios.get('/api/Displacements'),
+      //axios.get('/api/Displacements'),
       axios.get('/api/SearchOptions/LoanMonthlyOption'),
       axios.get('/api/SearchOptions/LoanDownOption'),
       axios.get('/api/SearchOptions/CarTypeOption'),
@@ -519,10 +532,6 @@ const fetchOptions = async () => {
     equipmentEnv.value     = equipEnvRes.data
     equipmentDressup.value = equipDressupRes.data
     seatOptions.value      = seatRes.data
-    mileageOptions.value = mileageRes.data.data.MileageList.map(item => ({
-        value: item.id,
-        label: item.name,
-    }))
     engineOptions.value = displacementRes.data.data.DisplacementList.map(item => ({
         value: item.id,
         label: item.name,
@@ -588,8 +597,8 @@ const form = reactive({
   loanMonthlyTo:      '',
   loanType:           [],
   loanDownPayment:    '',
-  colors:             [],  // ← 追加
-  options:            [],  // ← 追加
+  colors:             [],
+  options:            [],
   transmission:       [],
   carTypes:           [],
   bodyType:           '',
@@ -603,7 +612,7 @@ const form = reactive({
   slideDoor:          '',
   handle:             '',
   passengerCount:     '',
-  equipment:          [],  // ← 追加
+  equipment:          [],
   audio:              '',
   navi:               '',
   freeWord:           '',
@@ -632,8 +641,55 @@ const clearForm = () => {
   })
 }
 
+const mileageError      = ref('')
+const yearError         = ref('')
+const engineError       = ref('')
+
 const submitSearch = () => {
-  emit('search', { ...form })
+    mileageError.value = ''
+    yearError.value    = ''
+    engineError.value  = ''
+
+    if (form.mileageFrom && form.mileageTo &&
+        Number(form.mileageFrom) > Number(form.mileageTo)) {
+        mileageError.value = '走行距離の下限は上限より小さい値を設定してください'
+        return
+    }
+
+    if (form.yearFrom && form.yearTo &&
+        Number(form.yearFrom) > Number(form.yearTo)) {
+        yearError.value = '年式の下限は上限より小さい値を設定してください'
+        return
+    }
+
+    if (form.engineFrom && form.engineTo &&
+        Number(form.engineFrom) > Number(form.engineTo)) {
+        engineError.value = '排気量の下限は上限より小さい値を設定してください'
+        return
+    }
+
+    // 選択された色のgroupを取得してユニークにする
+    const selectedGroups = form.colors
+        .map(v => colorOptions.value.find(c => c.value === v)?.group)
+        .filter(Boolean)
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .join(',')
+
+      // audio・naviをoptionsに追加
+    const extraOptions = []
+    if (form.audio) extraOptions.push(form.audio)
+    if (form.navi)  extraOptions.push(form.navi)
+
+    const allOptions = [
+        ...form.options,
+        ...extraOptions,
+    ].filter(Boolean)
+
+    emit('search', {
+        ...form,
+        colors:  selectedGroups,
+        options: allOptions,
+    })
 }
 </script>
 
@@ -967,5 +1023,15 @@ const submitSearch = () => {
 }
 .search-filter__btn-icon {
   font-size: 14px;
+}
+
+
+
+.search-filter__error {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: #dc5078;
+    margin: 4px 0 0;
+    letter-spacing: 0.03em;
 }
 </style>

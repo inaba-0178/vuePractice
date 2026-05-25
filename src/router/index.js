@@ -23,6 +23,8 @@ import MypageFavorites from '@/views/Mypage/MypageFavorites.vue'
 import SelectConditionCarList from '@/views/Car/SelectConditionCarList.vue'
 import DealerDetail from '@/views/Dealer/DealerDetail.vue'
 import DealerList from '@/views/Dealer/DealerList.vue'
+import Maintenance from '@/views/Maintenance.vue'
+import axios from 'axios'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -140,16 +142,68 @@ const routes = [
     path: '/dealers',
     name: 'DealerList',
     component: DealerList,
-  }
+  },
+  {
+    path: '/maintenance',
+    name: 'maintenance',
+    component: Maintenance
+  },
 ]
+
+// ===== メンテナンスキャッシュ =====
+let maintenanceCache    = null
+let maintenanceCachedAt = null
+const CACHE_TTL         = 5 * 60 * 1000
+
+const checkMaintenance = async () => {
+  const now = Date.now()
+  if (
+    maintenanceCache !== null &&
+    maintenanceCachedAt &&
+    (now - maintenanceCachedAt) < CACHE_TTL
+  ) {
+    return maintenanceCache
+  }
+
+  try {
+    const res        = await axios.get('/api/Maintenance/status')
+    const isMaint    = res.data.is_maintenance
+
+    // メンテナンスOFFの場合はキャッシュをクリア
+    if (!isMaint) {
+      maintenanceCache    = false
+      maintenanceCachedAt = null
+    } else {
+      maintenanceCache    = true
+      maintenanceCachedAt = now
+    }
+
+    return isMaint
+  } catch (e) {
+    console.error('メンテナンス状態の取得に失敗しました', e)
+    return false
+  }
+}
+
+// routes は既存のまま
 
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
-// ルーターガード
-router.beforeEach((to) => {
+// ===== ルーターガード（1つにまとめる） =====
+router.beforeEach(async (to) => {
+  // メンテナンスページは常にアクセス可能
+  if (to.name === 'maintenance') return true
+
+  // メンテナンス状態チェック
+  const isMaintenance = await checkMaintenance()
+  if (isMaintenance) {
+    return { name: 'maintenance' }
+  }
+
+  // 認証チェック
   const token = localStorage.getItem('token')
   if (to.meta.requiresAuth && !token) {
     return { name: 'login' }
