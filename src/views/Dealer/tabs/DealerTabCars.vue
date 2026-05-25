@@ -88,6 +88,10 @@ const displayPages = computed(() => {
     return pages
 })
 
+const sortKey      = ref('')
+const sortOrder    = ref('')
+const searchParams = ref({})
+
 const fetchCarList = async () => {
     loading.value = true
     try {
@@ -97,6 +101,20 @@ const fetchCarList = async () => {
                 dealerId: props.dealerId,
                 offset,
                 limit,
+                sortKey:   sortKey.value,
+                sortOrder: sortOrder.value,
+                ...searchParams.value,
+            },
+            paramsSerializer: (params) => {
+                const query = new URLSearchParams()
+                Object.entries(params).forEach(([key, value]) => {
+                    if (Array.isArray(value)) {
+                        if (value.length > 0) query.append(key, value.join(','))
+                    } else if (value !== '' && value !== null && value !== undefined) {
+                        query.append(key, value)
+                    }
+                })
+                return query.toString()
             }
         })
         carList.value    = data.carList
@@ -107,6 +125,9 @@ const fetchCarList = async () => {
         loading.value = false
     }
 }
+
+const onSearch = (params) => { searchParams.value = params; currentPage.value = 1; fetchCarList() }
+const onSort   = ({ key, order }) => { sortKey.value = key; sortOrder.value = order; currentPage.value = 1; fetchCarList() }
 
 const goToPage       = (page) => { if (page < 1 || page > totalPages.value) return; currentPage.value = page }
 const goToDetail     = (id)   => router.push({ path: `/cars/${id}` })
