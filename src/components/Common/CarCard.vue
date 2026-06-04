@@ -77,15 +77,25 @@
         <div class="car-card__actions">
           <!-- お気に入り解除ボタン（MyPage側からslotで渡す） -->
           <slot name="actions" />
-          <button class="car-card__btn-inquiry" @click.stop>在庫確認・見積依頼</button>
+          <button class="car-card__btn-inquiry" @click.stop="showInquiry = true">
+            在庫確認・見積依頼
+          </button>
         </div>
       </div>
     </div>
   </div>
+  <InquiryModal
+    :show="showInquiry"
+    :car-id="Number(car.id)"
+    :dealer-id="Number(car.dealerId)"
+    @close="showInquiry = false"
+  />
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import CarPriceBlock from '@/components/Common/CarPriceBlock.vue'
+import InquiryModal from '@/components/Inquiry/InquiryModal.vue'
 
 const props = defineProps({
   car:           { type: Object,  required: true },
@@ -95,8 +105,9 @@ const props = defineProps({
 
 const emit = defineEmits(['click', 'toggle-favorite'])
 
-const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL
+const showInquiry = ref(false)
 
+const imageBaseUrl        = import.meta.env.VITE_IMAGE_BASE_URL
 const formatMileage       = (m) => m ? Number(m).toLocaleString() : '-'
 const formatRepairHistory = (val) => ({ none: 'なし', minor: '軽微あり', major: 'あり', unknown: '不明' }[val] ?? val ?? '-')
 const formatInspection    = (status, expireDate) => {

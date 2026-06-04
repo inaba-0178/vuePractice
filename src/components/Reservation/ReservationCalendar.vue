@@ -315,7 +315,10 @@ const fetchSchedules = async () => {
         month:             currentMonthStr.value,
       }
     })
-    schedules.value = res.data.schedules ?? []
+    schedules.value = (res.data.schedules ?? []).map(s => ({
+      ...s,
+      date: s.date.substring(0, 10)
+    }))
   } catch (e) {
     console.error(e)
   }

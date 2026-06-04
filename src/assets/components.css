@@ -126,14 +126,9 @@ body {
 =========================== */
 .hero {
     position: relative;
-    height: 320px;
     display: flex;
     align-items: center;
     overflow: hidden;
-}
-
-.hero--tall {
-    height: 480px;
 }
 
 .hero__bg {

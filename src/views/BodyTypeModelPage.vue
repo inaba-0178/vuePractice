@@ -322,4 +322,24 @@ onMounted(initData)
     gap: 16px;
     margin-bottom: 16px;
 }
+
+.car-item__image-link {
+    display: block;
+    background: white;
+    height: 200px;
+    overflow: hidden;
+    transition: height 0.5s ease 0.2s; /* 戻る時: 0.2s後にゆっくり戻る */
+}
+
+.car-item:hover .car-item__image-link {
+    height: 350px;
+    transition: height 0.3s ease 0.2s; /* ホバー時: 0.2s後に広がる */
+}
+
+.car-item__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
 </style>

@@ -4,12 +4,30 @@
         <main>
             <!-- ヒーロー -->
             <section class="hero hero--tall">
-                <div class="hero__inner">
-                    <p class="hero__label">PREMIUM CAR SEARCH</p>
-                    <h1 class="hero__title hero__title--large">ランディングページのタイトル</h1>
-                    <p class="hero__sub">サイトの内容や情報を伝え、続きへ誘導したくさせるサブ説明文...</p>
+                <div class="hero__slider">
+                    <div
+                        v-for="(slide, index) in slides"
+                        :key="index"
+                        class="hero__slide"
+                        :class="{ 'hero__slide--active': currentSlide === index }"
+                    >
+                        <img v-if="slide.image" :src="slide.image" class="hero__slide-img" alt="" />
+                        <div class="hero__inner">
+                            <p class="hero__label">{{ slide.label }}</p>
+                            <h1 class="hero__title hero__title--large">{{ slide.title }}</h1>
+                            <p class="hero__sub">{{ slide.sub }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="hero__bg" :style="{ backgroundImage: 'url(/hero-bg.jpg)' }"></div>
+                <div class="hero__indicators">
+                    <span
+                        v-for="(slide, index) in slides"
+                        :key="index"
+                        class="hero__indicator"
+                        :class="{ 'hero__indicator--active': currentSlide === index }"
+                        @click="currentSlide = index"
+                    ></span>
+                </div>
             </section>
 
             <!-- メーカーから探す -->
@@ -20,36 +38,25 @@
                 </div>
 
                 <div class="maker-nav">
-                    <div class="maker-nav__block">
+                    <div
+                        v-for="group in brandGroups"
+                        :key="group.position"
+                        class="maker-nav__block"
+                    >
                         <div class="maker-nav__head">
-                            <p class="maker-nav__head-title">国産<br>中古車</p>
-                            <a href="" class="maker-nav__all">すべて見る</a>
+                            <p class="maker-nav__head-title" v-html="group.label"></p>
+                            <!-- template側のすべて見るリンクをrouter-linkに変更 -->
+                            <router-link
+                                :to="{ path: '/maker/select', hash: group.anchor }"
+                                class="maker-nav__all"
+                            >
+                                すべて見る
+                            </router-link>
                         </div>
                         <ul class="maker-nav__list">
-                            <li v-for="brand in japaneseBrands" :key="brand.code" class="maker-nav__item">
+                            <li v-for="brand in group.brands" :key="brand.code" class="maker-nav__item">
                                 <router-link
                                     :to="{ name: 'MakerCarModel', params: { manufacturerName: brand.name } }"
-                                    :title="brand.name"
-                                    class="maker-nav__anchor"
-                                >
-                                    <div class="maker-nav__frame">
-                                        <i class="maker-nav__icon" :style="{ '--icon-image': `url(${brand.imageFilePath})` }"></i>
-                                    </div>
-                                    <p class="maker-nav__name">{{ brand.displayName }}</p>
-                                </router-link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="maker-nav__block">
-                        <div class="maker-nav__head">
-                            <p class="maker-nav__head-title">輸入<br>中古車</p>
-                            <a href="" class="maker-nav__all">すべて見る</a>
-                        </div>
-                        <ul class="maker-nav__list">
-                            <li v-for="brand in abroadBrands" :key="brand.code" class="maker-nav__item">
-                                <router-link
-                                    :to="{ name: 'MakerCarModel', params: { manufacturerCode: brand.code, manufacturerName: brand.name } }"
                                     :title="brand.name"
                                     class="maker-nav__anchor"
                                 >
@@ -111,20 +118,12 @@
                     <h2 class="section-title">都道府県から探す</h2>
                 </div>
                 <div class="area-wrap">
-                    <div class="area-col">
-                        <dl class="area-list" v-for="region in leftRegions" :key="region.name">
-                            <dt class="area-list__region">
-                                <a @click.prevent="goToRegionCarListByArea(region.prefectures)" style="cursor:pointer">
-                                    {{ region.name }}
-                                </a>
-                            </dt>
-                            <dd class="area-list__pref" v-for="pref in region.prefectures" :key="pref.name">
-                                <a @click.prevent="goToRegionCarList(pref.id)" style="cursor:pointer">{{ pref.name }}</a>
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="area-col">
-                        <dl class="area-list" v-for="region in rightRegions" :key="region.name">
+                    <div
+                        v-for="(col, index) in areaCols"
+                        :key="index"
+                        class="area-col"
+                    >
+                        <dl class="area-list" v-for="region in col" :key="region.name">
                             <dt class="area-list__region">
                                 <a @click.prevent="goToRegionCarListByArea(region.prefectures)" style="cursor:pointer">
                                     {{ region.name }}
@@ -145,42 +144,20 @@
                     <h2 class="section-title">こだわり条件から探す</h2>
                 </div>
                 <div class="choosy-wrap">
-                    <div class="choosy-item">
+                    <div
+                        v-for="group in choosyGroups"
+                        :key="group.title"
+                        class="choosy-item"
+                    >
                         <dl>
-                            <dt class="choosy-item__title">価格から探す</dt>
-                            <dd class="choosy-item__value" v-for="price in priceList" :key="price.name">
-                                <a @click.prevent="goToPriceList(price)" style="cursor:pointer">
-                                    {{ price.name }}
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="choosy-item">
-                        <dl>
-                            <dt class="choosy-item__title">走行距離から探す</dt>
-                            <dd class="choosy-item__value" v-for="mileage in mileageList" :key="mileage.name">
-                                <a @click.prevent="goToMileageList(mileage)" style="cursor:pointer">
-                                    {{ mileage.name }}
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="choosy-item">
-                        <dl>
-                            <dt class="choosy-item__title">乗車定員から探す</dt>
-                            <dd class="choosy-item__value" v-for="ridingCapacity in ridingCapacityList" :key="ridingCapacity.name">
-                                <a @click.prevent="goToPassengerList(ridingCapacity)" style="cursor:pointer">
-                                    {{ ridingCapacity.name }}
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="choosy-item">
-                        <dl>
-                            <dt class="choosy-item__title">排気量から探す</dt>
-                            <dd class="choosy-item__value" v-for="displacement in displacementList" :key="displacement.name">
-                                <a @click.prevent="goToDisplacementList(displacement)" style="cursor:pointer">
-                                    {{ displacement.name }}
+                            <dt class="choosy-item__title">{{ group.title }}</dt>
+                            <dd
+                                v-for="item in group.items"
+                                :key="item.name"
+                                class="choosy-item__value"
+                            >
+                                <a @click.prevent="group.handler(item)" style="cursor:pointer">
+                                    {{ item.name }}
                                 </a>
                             </dd>
                         </dl>
@@ -192,13 +169,48 @@
 </template>
 
 <script setup>
-    import { ref, watch, onMounted, computed } from 'vue'
+    import { ref, watch, onMounted, computed ,onUnmounted } from 'vue'
     import axios from 'axios'
     
     import { useRouter } from 'vue-router'
     
     const router = useRouter()
 
+    // スライダーデータをAPIから取得
+    const slides = ref([])
+    const sliderLoading = ref(false)
+
+    const fetchMainViews = async () => {
+        sliderLoading.value = true
+        try {
+            const { data } = await axios.get('http://laravel11practice.local:81/api/MainViewList')
+            slides.value = data.data.slides.map(slide => ({
+                label:    slide.label,
+                title:    slide.title,
+                sub:      slide.sub,
+                image:    slide.imagePath,
+                linkUrl:  slide.linkUrl,
+            }))
+        } catch (error) {
+            console.error('API Error:', error)
+        } finally {
+            sliderLoading.value = false
+        }
+    }
+
+    fetchMainViews()
+
+    const currentSlide = ref(0)
+    let sliderTimer = null
+
+    const startSlider = () => {
+        sliderTimer = setInterval(() => {
+            currentSlide.value = (currentSlide.value + 1) % slides.value.length
+        }, 4000) // 4秒ごとに切り替え
+    }
+
+    onMounted(() => startSlider())
+    onUnmounted(() => clearInterval(sliderTimer))
     const handleLogout = async () => {
         await auth.logout()
         router.push({ name: 'Landing' })
@@ -246,8 +258,13 @@
 
     const leftRegions  = computed(() => regions.value.slice(0, 5))
     const rightRegions = computed(() => regions.value.slice(5))
+    const areaCols = computed(() => [
+        leftRegions.value,
+        rightRegions.value,
+    ])
     fetchRegions()
 
+    //価格リスト
     const priceLists          = ref([])
     const priceListLoading    = ref(false)
     const fetchPriceLists = async () => {
@@ -278,6 +295,7 @@
         })
     }
 
+    //走行距離リスト
     const mileageLists       = ref([])
     const mileageListLoading = ref(false)
     const fetchmileageLists = async () => {
@@ -309,6 +327,7 @@
     const mileageList = computed(() => mileageLists.value)
     fetchmileageLists()
 
+    //排気量リスト
     const displacementLists       = ref([])
     const displacementListLoading = ref(false)
     const fetchdisplacementLists = async () => {
@@ -340,6 +359,7 @@
     const displacementList = computed(() => displacementLists.value)
     fetchdisplacementLists()
 
+    //乗車定員リスト
     const ridingCapacityLists       = ref([])
     const ridingCapacityListLoading = ref(false)
     const fetchRidingCapacityLists = async () => {
@@ -364,6 +384,29 @@
         })
     }
     const ridingCapacityList = computed(() => ridingCapacityLists.value)
+    
+    const choosyGroups = computed(() => [
+        {
+            title:   '価格から探す',
+            items:   priceList.value,
+            handler: goToPriceList,
+        },
+        {
+            title:   '走行距離から探す',
+            items:   mileageList.value,
+            handler: goToMileageList,
+        },
+        {
+            title:   '乗車定員から探す',
+            items:   ridingCapacityList.value,
+            handler: goToPassengerList,
+        },
+        {
+            title:   '排気量から探す',
+            items:   displacementList.value,
+            handler: goToDisplacementList,
+        },
+    ])
     fetchRidingCapacityLists()
 
     const featuredBrandLists       = ref([])
@@ -386,8 +429,22 @@
             loading.value = false
         }
     }
-    const japaneseBrands = computed(() => featuredBrandLists.value.slice(0, 9))
-    const abroadBrands   = computed(() => featuredBrandLists.value.slice(9))
+
+    // brandGroupsのlabelとanchorを追加
+    const brandGroups = computed(() => [
+        {
+            position: 'jp-top-row',
+            label:    '国産<br>中古車',
+            anchor:   '#japan',
+            brands:   featuredBrandLists.value.filter(b => b.position === 'jp-top-row'),
+        },
+        {
+            position: 'import-top-row',
+            label:    '輸入<br>中古車',
+            anchor:   '#germany',
+            brands:   featuredBrandLists.value.filter(b => b.position === 'import-top-row'),
+        },
+    ])
     fetchfeaturedBrandLists()
 
     const featuredBodyTypeLists       = ref([])
@@ -412,6 +469,7 @@
     const bodyTypesTop = computed(() => featuredBodyTypeLists.value.slice(0, 8))
     const bodyTypesBottom = computed(() => featuredBodyTypeLists.value.slice(8))
     fetchFeaturedBodyTypeLists()
+
 </script>
 
 <style scoped>
@@ -490,9 +548,9 @@
 .maker-nav__frame {
     width: 56px;
     height: 56px;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 4px;
+    background: transparent;  /* 背景透明 */
+    border: none;              /* 枠削除 */
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -500,8 +558,8 @@
 
 .maker-nav__icon {
     display: block;
-    width: 36px;
-    height: 36px;
+    width: 56px;   /* 36px → 56px */
+    height: 56px;  /* 36px → 56px */
     background-image: var(--icon-image);
     background-size: contain;
     background-repeat: no-repeat;
@@ -657,5 +715,85 @@
 
 .choosy-item__value a:hover {
     color: #dc5078;
+}
+
+.hero {
+    position: relative;
+    width: 100%;
+}
+
+.hero__slider {
+    position: relative;
+    width: 100%;
+}
+
+.hero__slide {
+    display: none;
+    position: relative;
+    width: 100%;
+}
+
+.hero__slide--active {
+    display: block;
+}
+
+.hero__slide-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.hero__slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero__inner {
+    position: absolute;
+    top: 40px;        /* 上からの位置 */
+    left: 80px;       /* 左からの位置 */
+    z-index: 1;
+    text-align: left; /* 左寄せ */
+    width: auto;
+    padding: 0;
+    transform: none;  /* centerのtransformを打ち消す */
+}
+
+.hero__indicators {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+}
+
+.hero__indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.hero__indicator--active {
+    background: #fff;
+}
+
+/* TOP専用 上書き */
+.hero__label {
+    font-size: 16px !important;
+}
+
+.hero__title--large {
+    font-size: 70px !important;
+}
+
+.hero__sub {
+    font-size: 18px !important;
 }
 </style>
