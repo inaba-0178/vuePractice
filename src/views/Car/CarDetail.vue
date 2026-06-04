@@ -137,7 +137,7 @@
             >
               {{ isFavorite ? '♥ お気に入り済み' : '♡ お気に入りに追加' }}
             </button>
-            <button class="car-detail__inquiry-btn">
+            <button class="car-detail__inquiry-btn" @click="showInquiry = true">
               在庫確認・見積依頼
             </button>
           </div>
@@ -459,7 +459,7 @@
               <button class="car-detail__map-btn" @click="openMap">
                 MAP を開く
               </button>
-              <button class="car-detail__inquiry-btn">
+              <button class="car-detail__inquiry-btn" @click="showInquiry = true">
                 在庫確認・見積依頼
               </button>
             </div>
@@ -518,18 +518,26 @@
                 <button class="car-detail__sticky-fav" @click="toggleFavorite">
                   {{ isFavorite ? '♥' : '♡' }}
                 </button>
-                <button class="car-detail__sticky-inquiry">在庫確認・見積依頼</button>
+                <button class="car-detail__sticky-inquiry" @click="showInquiry = true">
+                  在庫確認・見積依頼
+                </button>
               </div>
             </div>
           </div>
         </div>
     </template>
 
-
     <div v-else class="car-detail__not-found">
       車両情報が見つかりませんでした。
     </div>
   </div>
+
+  <InquiryModal
+    :show="showInquiry"
+    :car-id="Number(car?.id)"
+    :dealer-id="Number(car?.dealerId)"
+    @close="showInquiry = false"
+  />
 </template>
 
 <script setup>
@@ -540,6 +548,8 @@
   import ReservationCalendar from '@/components/Reservation/ReservationCalendar.vue'
   import LoanSimulatorModal from '@/components/Loan/LoanSimulatorModal.vue'
   import { useMemberAuthStore } from '@/stores/memberAuth'
+  import InquiryModal from '@/components/Inquiry/InquiryModal.vue'
+  const showInquiry = ref(false)
   const memberAuthStore = useMemberAuthStore()
 
   const route = useRoute()
@@ -692,7 +702,9 @@
 
 
       const [dealerRes, reviewRes, vehicleSpecRes] = await Promise.all([
+        //ディーラー情報
         axios.get('/api/SelectDealerData', { params: { dealerId: data.carData.dealerId } }),
+        //口コミ取得
         axios.get('/api/SelectDealerReview', { params: { dealerId: data.carData.dealerId } }),
         axios.get('/api/SelectVehicleSpec', { params: { vehicleId: data.carData.vehicleId } }),
       ])

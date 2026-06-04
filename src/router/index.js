@@ -24,6 +24,7 @@ import SelectConditionCarList from '@/views/Car/SelectConditionCarList.vue'
 import DealerDetail from '@/views/Dealer/DealerDetail.vue'
 import DealerList from '@/views/Dealer/DealerList.vue'
 import Maintenance from '@/views/Maintenance.vue'
+import MakerAllSelect from '@/views/Maker/MakerAllSelect.vue'
 import axios from 'axios'
 
 const routes = [
@@ -147,6 +148,11 @@ const routes = [
     path: '/maintenance',
     name: 'maintenance',
     component: Maintenance
+  },
+  {
+    path: '/maker/select',
+    name: 'MakerAllSelect',
+    component: MakerAllSelect,
   },
 ]
 
