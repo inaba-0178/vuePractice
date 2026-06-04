@@ -549,6 +549,7 @@
   import LoanSimulatorModal from '@/components/Loan/LoanSimulatorModal.vue'
   import { useMemberAuthStore } from '@/stores/memberAuth'
   import InquiryModal from '@/components/Inquiry/InquiryModal.vue'
+  import { useViewCount } from '@/composables/Analytics/useViewCount'
   const showInquiry = ref(false)
   const memberAuthStore = useMemberAuthStore()
 
@@ -664,6 +665,12 @@
     return new Date(dateStr).toLocaleDateString('ja-JP')
   }
 
+  // useViewCountを呼び出してstartを取得
+  const { start: startViewCount } = useViewCount({
+    getCarId:    () => Number(carId),
+    getDealerId: () => Number(car.value?.dealerId), // ← 関数として渡す
+  })
+
   // データ取得
   const fetchAll = async () => {
     loading.value = true
@@ -712,6 +719,8 @@
       reviews.value = reviewRes.data.reviews ?? []
       vehicleSpec.value  = vehicleSpecRes.data
 
+      // fetchAll完了後にviewCountを開始
+      await startViewCount()
     } catch (e) {
       console.error(e)
     } finally {
