@@ -3,10 +3,10 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 export const useChatStore = defineStore('chat', () => {
-    const rooms = ref([])
-    const currentRoom = ref(null)
-    const messages = ref([])
-    const typingUsers = ref([])
+    const rooms        = ref([])
+    const currentRoom  = ref(null)
+    const messages     = ref([])
+    const typingUsers  = ref([])
 
     // ルーム一覧取得
     async function fetchRooms() {
@@ -25,7 +25,7 @@ export const useChatStore = defineStore('chat', () => {
         await fetchMessages(roomId)
         subscribeToRoom(roomId)
 
-        // ルーム入室時に未読メッセージを既読にする
+        // 未読メッセージを既読にする
         const unreadIds = messages.value
             .filter(m => m.message_reads?.length === 0)
             .map(m => m.id)
@@ -38,14 +38,12 @@ export const useChatStore = defineStore('chat', () => {
     // メッセージ取得
     async function fetchMessages(roomId) {
         const { data } = await axios.get(`/api/rooms/${roomId}/messages`)
-        console.log('メッセージデータ:', JSON.stringify(data[0]))
         messages.value = data
     }
 
     // メッセージ送信
     async function sendMessage(roomId, message) {
-        const { data } = await axios.post(`/api/rooms/${roomId}/messages`, { message })
-        //messages.value.push(data)
+        await axios.post(`/api/rooms/${roomId}/messages`, { message })
     }
 
     // 既読送信
@@ -60,12 +58,17 @@ export const useChatStore = defineStore('chat', () => {
 
     // WebSocket購読
     function subscribeToRoom(roomId) {
+        // if (!window.Echo) {
+        //     console.warn('Echo is not initialized')
+        //     return
+        // }
         window.Echo.channel(`room.${roomId}`)
             .listen('.message.sent', (e) => {
                 messages.value.push({
                     id:            e.id,
                     room_id:       e.roomId,
                     user_id:       e.userId,
+                    user_type:     e.userType,
                     message:       e.message,
                     created_at:    e.createdAt,
                     user:          e.user,
@@ -74,24 +77,29 @@ export const useChatStore = defineStore('chat', () => {
                 markAsRead(roomId, [e.id])
             })
             .listen('.message.read', (e) => {
-                // 既読されたメッセージのmessage_readsを更新
                 e.messageIds.forEach(messageId => {
                     const message = messages.value.find(m => m.id === messageId)
                     if (message) {
                         if (!message.message_reads) {
                             message.message_reads = []
                         }
-                        // 同じユーザーの既読が重複しないように
-                        const alreadyRead = message.message_reads.some(r => r.user_id === e.userId)
+                        const alreadyRead = message.message_reads.some(
+                            r => r.user_id === e.userId && r.user_type === e.userType
+                        )
                         if (!alreadyRead) {
-                            message.message_reads.push({ user_id: e.userId })
+                            message.message_reads.push({
+                                user_id:   e.userId,
+                                user_type: e.userType,
+                            })
                         }
                     }
                 })
             })
             .listenForWhisper('typing', (e) => {
                 if (e.isTyping) {
-                    typingUsers.value.push(e.userName)
+                    if (!typingUsers.value.includes(e.userName)) {
+                        typingUsers.value.push(e.userName)
+                    }
                 } else {
                     typingUsers.value = typingUsers.value.filter(u => u !== e.userName)
                 }

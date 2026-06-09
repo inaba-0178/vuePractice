@@ -15,7 +15,7 @@
       <div class="message__meta">
         <span class="message__time">{{ formatTime(message.created_at) }}</span>
         <span class="message__read" v-if="isMyMessage(message)">
-            {{ readCount(message) > 0 ? `既読 ${readCount(message)}` : '未読' }}
+          {{ readCount(message) > 0 ? `既読 ${readCount(message)}` : '未読' }}
         </span>
       </div>
     </div>
@@ -31,7 +31,11 @@ const props = defineProps({
     default: () => []
   },
   currentUserId: {
-    type: Number,
+    type: String,  // UUIDとBIGINT両対応のためStringに変更
+    required: true
+  },
+  currentUserType: {
+    type: String,  // 'staff' or 'member'
     required: true
   }
 })
@@ -39,16 +43,22 @@ const props = defineProps({
 const emit = defineEmits(['read'])
 
 const messageListRef = ref(null)
-const observer = ref(null)
+const observer       = ref(null)
 
-const isMyMessage = (message) => message.user_id === props.currentUserId
+const isMyMessage = (message) => {
+  return String(message.user_id) === String(props.currentUserId)
+    && message.user_type === props.currentUserType
+}
+
 const readCount = (message) => {
-    return message.message_reads?.filter(r => r.user_id !== message.user_id).length ?? 0
+  return message.message_reads?.filter(
+    r => !(String(r.user_id) === String(message.user_id) && r.user_type === message.user_type)
+  ).length ?? 0
 }
 
 const formatTime = (datetime) => {
   return new Date(datetime).toLocaleTimeString('ja-JP', {
-    hour: '2-digit',
+    hour:   '2-digit',
     minute: '2-digit'
   })
 }
@@ -58,10 +68,15 @@ function setupObserver() {
   observer.value = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const messageId = Number(entry.target.dataset.messageId)
-        const message = props.messages.find(m => m.id === messageId)
-        // 自分のメッセージでなく未読のものだけ既読にする
-        if (message && !isMyMessage(message) && message.message_reads?.length === 0) {
+        const messageId   = Number(entry.target.dataset.messageId)
+        const messageType = entry.target.dataset.userType
+        const message     = props.messages.find(m => m.id === messageId)
+
+        if (
+          message &&
+          !isMyMessage(message) &&
+          message.message_reads?.length === 0
+        ) {
           emit('read', messageId)
           observer.value.unobserve(entry.target)
         }
@@ -73,13 +88,13 @@ function setupObserver() {
 function setMessageRef(el, message) {
   if (el && !isMyMessage(message)) {
     el.dataset.messageId = message.id
+    el.dataset.userType  = message.user_type
     if (observer.value) {
       observer.value.observe(el)
     }
   }
 }
 
-// Observer初期化
 setupObserver()
 
 onUnmounted(() => {
@@ -88,7 +103,6 @@ onUnmounted(() => {
   }
 })
 
-// 新メッセージで自動スクロール
 watch(() => props.messages.length, async () => {
   await nextTick()
   if (messageListRef.value) {

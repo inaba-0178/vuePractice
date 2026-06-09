@@ -1,9 +1,10 @@
-import { createApp }    from 'vue'
-import { createPinia }  from 'pinia'
-import App              from './App.vue'
-import router           from './router'
-import axios            from 'axios'
-import { useAuthStore } from './stores/auth'
+import { createApp }         from 'vue'
+import { createPinia }       from 'pinia'
+import App                   from './App.vue'
+import router                from './router'
+import axios                 from 'axios'
+import { useAuthStore }      from './stores/auth'
+import { useMemberAuthStore } from './stores/memberAuth'
 
 axios.defaults.baseURL = 'http://laravel11practice.local:81'
 
@@ -15,9 +16,8 @@ app.use(router)
 const auth = useAuthStore()
 auth.restore()
 
-const memberToken = localStorage.getItem('member_token')
-if (memberToken) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${memberToken}`
-}
+// memberAuth復元（Echo初期化含む）
+const memberAuth = useMemberAuthStore()
+memberAuth.restore()
 
 app.mount('#app')

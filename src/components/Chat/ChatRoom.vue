@@ -6,7 +6,8 @@
     <div class="chat-room__messages">
       <MessageList
         :messages="messages"
-        :current-user-id="currentUserId"
+        :current-user-id="String(currentUserId)"
+        :current-user-type="currentUserType"
         @read="handleRead"
       />
     </div>
@@ -31,14 +32,18 @@ const props = defineProps({
     required: true
   },
   currentUserId: {
-    type: Number,
+    type: String,
+    required: true
+  },
+  currentUserType: {
+    type: String,
     required: true
   }
 })
 
-const chatStore = useChatStore()
-const room = computed(() => chatStore.currentRoom)
-const messages = computed(() => chatStore.messages)
+const chatStore   = useChatStore()
+const room        = computed(() => chatStore.currentRoom)
+const messages    = computed(() => chatStore.messages)
 const typingUsers = computed(() => chatStore.typingUsers)
 
 const handleSend = async (message) => {
@@ -67,13 +72,16 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow: hidden; /* 追加 */
 }
 .chat-room__header {
   padding: 16px;
   border-bottom: 1px solid #eee;
+  flex-shrink: 0; /* 追加 */
 }
 .chat-room__messages {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto; /* hiddenからautoに変更 */
+  min-height: 0; /* 追加 */
 }
 </style>
