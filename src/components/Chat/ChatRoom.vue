@@ -80,7 +80,10 @@ const getIconColor = (userType) => {
   return userType === 'staff' ? '#185FA5' : '#dc5078'
 }
 
-const handleSend   = async (message)   => await chatStore.sendMessage(props.roomId, message)
+const handleSend = async ({ message, attachments }) => {
+  await chatStore.sendMessage(props.roomId, message, attachments)
+}
+
 const handleRead   = async (messageId) => await chatStore.markAsRead(props.roomId, [messageId])
 const handleTyping = async (isTyping)  => await chatStore.sendTyping(props.roomId, isTyping)
 
