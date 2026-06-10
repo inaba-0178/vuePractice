@@ -49,8 +49,21 @@ export const useChatStore = defineStore('chat', () => {
     }
 
     // メッセージ送信
-    async function sendMessage(roomId, message) {
-        await axios.post(`/api/rooms/${roomId}/messages`, { message })
+    async function sendMessage(roomId, message, attachments = []) {
+        if (attachments.length > 0) {
+            // 添付ファイルがある場合はFormDataで送信
+            const formData = new FormData()
+            if (message) formData.append('message', message)
+            attachments.forEach((file, index) => {
+                formData.append(`attachments[${index}]`, file)
+            })
+
+            await axios.post(`/api/rooms/${roomId}/messages`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
+        } else {
+            await axios.post(`/api/rooms/${roomId}/messages`, { message })
+        }
     }
 
     // 既読送信
@@ -72,14 +85,18 @@ export const useChatStore = defineStore('chat', () => {
         window.Echo.channel(`room.${roomId}`)
             .listen('.message.sent', (e) => {
                 messages.value.push({
-                    id:            e.id,
-                    room_id:       e.roomId,
-                    user_id:       e.userId,
-                    user_type:     e.userType,
-                    message:       e.message,
-                    created_at:    e.createdAt,
-                    user:          e.user,
-                    message_reads: [],
+                    id:              e.id,
+                    room_id:         e.roomId,
+                    user_id:         e.userId,
+                    user_type:       e.userType,
+                    message:         e.message,
+                    created_at:      e.createdAt,
+                    user:            e.user,
+                    attachment_url:  e.attachment?.attachment_url  ?? null,
+                    attachment_type: e.attachment?.attachment_type ?? null,
+                    attachment_name: e.attachment?.attachment_name ?? null,
+                    attachment_size: e.attachment?.attachment_size ?? null,
+                    message_reads:   [],
                 })
                 markAsRead(roomId, [e.id])
             })
