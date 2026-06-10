@@ -55,7 +55,7 @@ const routes = [
     path: '/chat/:roomId?',
     name: 'chat',
     component: ChatView,
-    meta: { requiresAuth: true }
+    meta: { requiresMemberAuth: true }
   },
   {
     path: '/forgot-password',
@@ -198,22 +198,26 @@ const router = createRouter({
   routes
 })
 
-// ===== ルーターガード（1つにまとめる） =====
+// ルーターガードに追加
 router.beforeEach(async (to) => {
-  // メンテナンスページは常にアクセス可能
-  if (to.name === 'maintenance') return true
+    if (to.name === 'maintenance') return true
 
-  // メンテナンス状態チェック
-  const isMaintenance = await checkMaintenance()
-  if (isMaintenance) {
-    return { name: 'maintenance' }
-  }
+    const isMaintenance = await checkMaintenance()
+    if (isMaintenance) {
+        return { name: 'maintenance' }
+    }
 
-  // 認証チェック
-  const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) {
-    return { name: 'login' }
-  }
+    // usersの認証チェック
+    const token = localStorage.getItem('token')
+    if (to.meta.requiresAuth && !token) {
+        return { name: 'login' }
+    }
+
+    // usr_usersの認証チェック
+    const memberToken = localStorage.getItem('member_token')
+    if (to.meta.requiresMemberAuth && !memberToken) {
+        return { name: 'member-login' }
+    }
 })
 
 export default router

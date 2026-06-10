@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { initEcho } from './echo'  // echoからimport
 
 export const useMemberAuthStore = defineStore('memberAuth', {
     state: () => ({
@@ -22,6 +23,7 @@ export const useMemberAuthStore = defineStore('memberAuth', {
             localStorage.setItem('member', JSON.stringify(data.member))
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+            initEcho(data.token) // 追加
         },
 
         async logout() {
@@ -41,6 +43,7 @@ export const useMemberAuthStore = defineStore('memberAuth', {
         restore() {
             if (this.token) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+                initEcho(this.token) // 追加
             }
         },
     },

@@ -16,8 +16,10 @@
     <div class="chat-view__main">
       <ChatRoom
         v-if="selectedRoomId"
+        :key="selectedRoomId"
         :room-id="selectedRoomId"
-        :current-user-id="currentUserId"
+        :current-user-id="String(currentUserId)"
+        :current-user-type="currentUserType"
       />
       <div v-else class="chat-view__empty">
         ルームを選択してください
@@ -30,19 +32,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chat'
-import { useAuthStore } from '@/stores/auth'
+import { useMemberAuthStore } from '@/stores/memberAuth'
 import ChatRoom from '@/components/Chat/ChatRoom.vue'
 
-const auth = useAuthStore()
-const currentUserId = computed(() => auth.user?.id)
+const memberAuthStore = useMemberAuthStore()
+const currentUserId   = computed(() => String(memberAuthStore.member?.id ?? ''))
+const currentUserType = computed(() => 'member')
+
 const selectedRoomId = ref(null)
+const chatStore      = useChatStore()
+const rooms          = computed(() => chatStore.rooms)
+const route          = useRoute()
+const router         = useRouter()
 
-const chatStore = useChatStore()
-const rooms = computed(() => chatStore.rooms)
-const route = useRoute()
-const router = useRouter()
-
-const selectRoom = async (roomId) => {
+const selectRoom = (roomId) => {
   selectedRoomId.value = roomId
   router.push({ name: 'chat', params: { roomId } })
 }
@@ -59,11 +62,14 @@ onMounted(async () => {
 .chat-view {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 .chat-view__sidebar {
   width: 240px;
   border-right: 1px solid #eee;
   padding: 16px;
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 .chat-view__sidebar ul {
   list-style: none;
@@ -76,11 +82,12 @@ onMounted(async () => {
 }
 .chat-view__sidebar li.active,
 .chat-view__sidebar li:hover {
-  background: #f0f0f0;
+  background: #4b07fa;
 }
 .chat-view__main {
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 .chat-view__empty {
   display: flex;
