@@ -26,6 +26,8 @@ import DealerList from '@/views/Dealer/DealerList.vue'
 import Maintenance from '@/views/Maintenance.vue'
 import MakerAllSelect from '@/views/Maker/MakerAllSelect.vue'
 import axios from 'axios'
+import ChatInvite from '@/views/ChatInvite/ChatInvite.vue'
+import ChatInviteList from '@/views/ChatInvite/ChatInviteList.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -153,6 +155,18 @@ const routes = [
     path: '/maker/select',
     name: 'MakerAllSelect',
     component: MakerAllSelect,
+  },
+  {
+    path: '/chat/invite',
+    name: 'chat-invite',
+    component: ChatInvite,
+    meta: { requiresMemberAuth: true }
+  },
+  {
+      path: '/chat/invites',
+      name: 'chat-invite-list',
+      component: ChatInviteList,
+      meta: { requiresMemberAuth: true }
   },
 ]
 
