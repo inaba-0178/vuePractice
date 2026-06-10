@@ -14,6 +14,12 @@ export const useChatStore = defineStore('chat', () => {
         rooms.value = data
     }
 
+    // ルーム参加者取得
+    async function fetchRoomUsers(roomId) {
+        const { data } = await axios.get(`/api/rooms/${roomId}`)
+        currentRoom.value = data
+    }
+
     // ルーム選択
     async function selectRoom(roomId) {
         if (currentRoom.value) {
@@ -21,6 +27,7 @@ export const useChatStore = defineStore('chat', () => {
         }
 
         const { data } = await axios.get(`/api/rooms/${roomId}`)
+         console.log('room data:', JSON.stringify(data))  // ← 追加
         currentRoom.value = data
         await fetchMessages(roomId)
         subscribeToRoom(roomId)

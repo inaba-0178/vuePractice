@@ -16,6 +16,7 @@
     <div class="chat-view__main">
       <ChatRoom
         v-if="selectedRoomId"
+        :key="selectedRoomId"
         :room-id="selectedRoomId"
         :current-user-id="String(currentUserId)"
         :current-user-type="currentUserType"
@@ -36,7 +37,7 @@ import ChatRoom from '@/components/Chat/ChatRoom.vue'
 
 const memberAuthStore = useMemberAuthStore()
 const currentUserId   = computed(() => String(memberAuthStore.member?.id ?? ''))
-const currentUserType = computed(() => 'member') // Vue側はusr_usersのみ
+const currentUserType = computed(() => 'member')
 
 const selectedRoomId = ref(null)
 const chatStore      = useChatStore()
@@ -44,7 +45,7 @@ const rooms          = computed(() => chatStore.rooms)
 const route          = useRoute()
 const router         = useRouter()
 
-const selectRoom = async (roomId) => {
+const selectRoom = (roomId) => {
   selectedRoomId.value = roomId
   router.push({ name: 'chat', params: { roomId } })
 }
@@ -81,7 +82,7 @@ onMounted(async () => {
 }
 .chat-view__sidebar li.active,
 .chat-view__sidebar li:hover {
-  background: #f0f0f0;
+  background: #4b07fa;
 }
 .chat-view__main {
   flex: 1;
