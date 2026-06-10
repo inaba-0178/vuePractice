@@ -22,7 +22,7 @@
 
         <div :class="['message', isMyMessage(item) ? 'message--mine' : 'message--others']">
           <div class="message__user">{{ item.user?.name ?? '不明' }}</div>
-          <div class="message__body">{{ item.message }}</div>
+          <div class="message__body" style="white-space: pre-wrap;">{{ item.message }}</div>
           <div class="message__meta">
             <span class="message__time">{{ formatTime(item.created_at) }}</span>
             <span class="message__read" v-if="isMyMessage(item)">
@@ -211,6 +211,7 @@ watch(() => props.messages.length, async () => {
   padding: 8px 12px;
   border-radius: 12px;
   font-size: 13px;
+  color: #000;
 }
 .message--mine .message__body {
   background: #4a90e2;
