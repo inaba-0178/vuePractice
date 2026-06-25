@@ -502,7 +502,6 @@ const fetchOptions = async () => {
       equipEnvRes,
       equipDressupRes,
       seatRes,
-      mileageRes,
       displacementRes,
       loanMonthlyRes,
       loanDownRes,
@@ -517,11 +516,11 @@ const fetchOptions = async () => {
       axios.get('/api/SearchOptions/EquipmentEnv'),
       axios.get('/api/SearchOptions/EquipmentDressup'),
       axios.get('/api/SearchOptions/SeatOption'),
-      //axios.get('/api/Displacements'),
+      axios.get('/api/Displacements'),
       axios.get('/api/SearchOptions/LoanMonthlyOption'),
       axios.get('/api/SearchOptions/LoanDownOption'),
       axios.get('/api/SearchOptions/CarTypeOption'),
-      axios.get('api/RidingCapacities'),
+      axios.get('/api/RidingCapacities'),
     ])
 
     colorOptions.value     = colorRes.data
@@ -532,7 +531,7 @@ const fetchOptions = async () => {
     equipmentEnv.value     = equipEnvRes.data
     equipmentDressup.value = equipDressupRes.data
     seatOptions.value      = seatRes.data
-    engineOptions.value = displacementRes.data.data.DisplacementList.map(item => ({
+    engineOptions.value    = displacementRes.data.data.DisplacementList.map(item => ({
         value: item.id,
         label: item.name,
     }))
