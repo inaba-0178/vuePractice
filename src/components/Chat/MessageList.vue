@@ -268,6 +268,7 @@
     font-size: 13px;
     display: inline-block;
     max-width: 100%;
+    color: #000;
   }
   .message--mine .message__body {
     background: #4a90e2;
