@@ -4,7 +4,7 @@ import axios from 'axios'
 
 window.Pusher = Pusher
 
-export function initEcho(token) {
+export function initEcho() {
   window.Echo = new Echo({
     broadcaster: 'reverb',
     key:      import.meta.env.VITE_REVERB_APP_KEY,
@@ -19,8 +19,6 @@ export function initEcho(token) {
         axios.post('/broadcasting/auth', {
           socket_id:    socketId,
           channel_name: channel.name,
-        }, {
-          headers: { Authorization: `Bearer ${token}` },
         })
           .then(({ data }) => callback(null, data))
           .catch((err)   => callback(err, null))

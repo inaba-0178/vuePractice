@@ -27,7 +27,6 @@ export const useChatStore = defineStore('chat', () => {
         }
 
         const { data } = await axios.get(`/api/rooms/${roomId}`)
-         console.log('room data:', JSON.stringify(data))  // ← 追加
         currentRoom.value = data
         await fetchMessages(roomId)
         subscribeToRoom(roomId)
@@ -82,7 +81,7 @@ export const useChatStore = defineStore('chat', () => {
         //     console.warn('Echo is not initialized')
         //     return
         // }
-        window.Echo.channel(`room.${roomId}`)
+        window.Echo.private(`room.${roomId}`)
             .listen('.message.sent', (e) => {
                 messages.value.push({
                     id:              e.id,
