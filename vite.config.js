@@ -20,7 +20,7 @@ export default defineConfig({
       usePolling: true
     },
     hmr: {
-      host: 'localhost'  // ホットリロード用
+      host: 'laravel11practice.local'
     }
   }
 })

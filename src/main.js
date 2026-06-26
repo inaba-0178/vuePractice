@@ -6,7 +6,8 @@ import axios                 from 'axios'
 import { useAuthStore }      from './stores/auth'
 import { useMemberAuthStore } from './stores/memberAuth'
 
-axios.defaults.baseURL = 'http://laravel11practice.local:81'
+axios.defaults.baseURL         = 'http://laravel11practice.local:81'
+axios.defaults.withCredentials = true
 
 const app = createApp(App)
 app.use(createPinia())

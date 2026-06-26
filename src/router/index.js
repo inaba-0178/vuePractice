@@ -84,8 +84,8 @@ const routes = [
     name: 'member-login',
     component: MemberLogin
   },
-  { path: '/mypage', component: MypageLayout, children: [
-    { 
+  { path: '/mypage', component: MypageLayout, meta: { requiresMemberAuth: true }, children: [
+    {
       path: '',
       name: 'mypage',
       component: MypageProfile
@@ -228,8 +228,8 @@ router.beforeEach(async (to) => {
     }
 
     // usr_usersの認証チェック
-    const memberToken = localStorage.getItem('member_token')
-    if (to.meta.requiresMemberAuth && !memberToken) {
+    const member = localStorage.getItem('member')
+    if (to.meta.requiresMemberAuth && !member) {
         return { name: 'member-login' }
     }
 })
